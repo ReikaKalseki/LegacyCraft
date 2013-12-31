@@ -35,7 +35,8 @@ public enum LegacyOptions implements ConfigList {
 	OLDPOTIONS("Old Regen and Heal Potions", true), //1.6
 	GOLDENAPPLE("Golden Apple Level 0 Uses Nuggets", true), //1.6
 	//HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5; dummied out since not possible without base class edit
-	SPIDERPOTIONS("Spider Potion Effects on Spawn", false); //1.6
+	SPIDERPOTIONS("Spider Potion Effects on Spawn", false), //1.6
+	FORCEZOMBIES("Enforced Mob Controls", true);
 
 	private String label;
 	private boolean defaultState;

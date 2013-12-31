@@ -30,6 +30,18 @@ public class EntityLegacyCreeper extends EntityCreeper {
 			this.setCanPickUpLoot(false);
 	}
 
+	public EntityLegacyCreeper(EntityCreeper e) {
+		this(e.worldObj);
+		this.setPosition(e.posX, e.posY, e.posZ);
+		motionX = e.motionX;
+		motionY = e.motionY;
+		motionZ = e.motionZ;
+		for (int i = 0; i < 5; i++) {
+			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+		}
+		this.setHealth(e.getHealth());
+	}
+
 	@Override
 	public boolean isAIEnabled()
 	{

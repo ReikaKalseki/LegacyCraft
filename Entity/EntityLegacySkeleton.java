@@ -58,6 +58,18 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 			this.setCanPickUpLoot(false);
 	}
 
+	public EntityLegacySkeleton(EntitySkeleton e) {
+		this(e.worldObj);
+		this.setPosition(e.posX, e.posY, e.posZ);
+		motionX = e.motionX;
+		motionY = e.motionY;
+		motionZ = e.motionZ;
+		for (int i = 0; i < 5; i++) {
+			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+		}
+		this.setHealth(e.getHealth());
+	}
+
 	@Override
 	public boolean isAIEnabled()
 	{

@@ -68,6 +68,18 @@ public class EntityLegacyZombie extends EntityZombie {
 			this.setCanPickUpLoot(false);
 	}
 
+	public EntityLegacyZombie(EntityZombie e) {
+		this(e.worldObj);
+		this.setPosition(e.posX, e.posY, e.posZ);
+		motionX = e.motionX;
+		motionY = e.motionY;
+		motionZ = e.motionZ;
+		for (int i = 0; i < 5; i++) {
+			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+		}
+		this.setHealth(e.getHealth());
+	}
+
 	@Override
 	protected void applyEntityAttributes()
 	{
