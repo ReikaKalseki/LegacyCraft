@@ -30,6 +30,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
@@ -199,6 +201,20 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 				}
 
 				this.entityDropItem(itemstack, 0.0F);
+			}
+		}
+	}
+
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
+
+		if (!LegacyOptions.MOBPICKUP.getState()) {
+			for (int i = 1; i < 5; i++) {
+				ItemStack is = this.getCurrentItemOrArmor(i);
+				this.setCurrentItemOrArmor(i, null);
+				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
+					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
 			}
 		}
 	}

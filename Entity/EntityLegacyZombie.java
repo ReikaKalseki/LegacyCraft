@@ -30,6 +30,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
@@ -158,7 +160,21 @@ public class EntityLegacyZombie extends EntityZombie {
 	}
 
 	@Override
-	protected void dropEquipment(boolean par1, int par2)
+	public void onUpdate() {
+		super.onUpdate();
+
+		if (!LegacyOptions.MOBPICKUP.getState()) {
+			for (int i = 0; i < 5; i++) {
+				ItemStack is = this.getCurrentItemOrArmor(i);
+				this.setCurrentItemOrArmor(i, null);
+				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
+					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
+			}
+		}
+	}
+
+	@Override
+	protected void dropEquipment(boolean par1, int par2) //args: was killed by player, looting
 	{
 		for (int j = 0; j < this.getLastActiveItems().length; ++j)
 		{

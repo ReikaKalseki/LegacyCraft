@@ -18,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
@@ -82,6 +84,15 @@ public class EntityLegacyCreeper extends EntityCreeper {
 			this.setCreeperState(-1);
 
 		super.onUpdate();
+
+		if (!LegacyOptions.MOBPICKUP.getState()) {
+			for (int i = 0; i < 5; i++) {
+				ItemStack is = this.getCurrentItemOrArmor(i);
+				this.setCurrentItemOrArmor(i, null);
+				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
+					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
+			}
+		}
 	}
 
 	@Override
