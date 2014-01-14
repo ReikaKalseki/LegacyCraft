@@ -22,6 +22,7 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.Event.Result;
@@ -47,6 +48,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
@@ -100,6 +102,15 @@ public class LegacyCraft extends DragonAPIMod {
 					}
 				}
 			}
+		}
+
+		if (LegacyOptions.OLDBOOK.getState()) {
+			List<ShapedRecipes> li = ReikaRecipeHelper.getShapedRecipesByOutput(new ItemStack(Item.book.itemID, 1, 0));
+			for (int i = 0; i < li.size(); i++) {
+				ShapedRecipes ir = li.get(i);
+				CraftingManager.getInstance().getRecipeList().remove(ir);
+			}
+			GameRegistry.addRecipe(new ItemStack(Item.book), "P", "P", "P", 'P', Item.paper);
 		}
 
 		TickRegistry.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);

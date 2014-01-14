@@ -14,10 +14,12 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.world.World;
 import Reika.LegacyCraft.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.ITickHandler;
@@ -34,7 +36,7 @@ public class LegacyTickHandler implements ITickHandler {
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) {
 		World world = (World)tickData[0];
-		if (LegacyOptions.FORCEZOMBIES.getState()) {
+		if (LegacyOptions.FORCEMOBS.getState()) {
 			List<Entity> li = world.loadedEntityList;
 			for (int i = 0; i < li.size(); i++) {
 				Entity e = li.get(i);
@@ -47,8 +49,18 @@ public class LegacyTickHandler implements ITickHandler {
 				if (e.getClass() == EntityCreeper.class) {
 					this.convertCreeper(world, (EntityCreeper)e);
 				}
+				if (e.getClass() == EntityEnderman.class) {
+					this.convertEnderman(world, (EntityEnderman)e);
+				}
 			}
 		}
+	}
+
+	private void convertEnderman(World world, EntityEnderman e) {
+		EntityLegacyEnderman z = new EntityLegacyEnderman(e);
+		e.setDead();
+		if (!world.isRemote)
+			world.spawnEntityInWorld(z);
 	}
 
 	private void convertZombie(World world, EntityZombie e) {
