@@ -38,6 +38,7 @@ import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.LegacyCraft.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Entity.EntityLegacySpider;
 import Reika.LegacyCraft.Entity.EntityLegacyZombie;
@@ -85,6 +86,7 @@ public class LegacyCraft extends DragonAPIMod {
 		EntityList.addMapping(EntityLegacySkeleton.class, "Skeleton", 51, 12698049, 4802889);
 		EntityList.addMapping(EntityLegacyZombie.class, "Zombie", 54, 44975, 7969893);
 		EntityList.addMapping(EntityLegacySpider.class, "Spider", 52, 3419431, 11013646);
+		EntityList.addMapping(EntityLegacyEnderman.class, "Enderman", 58, 1447446, 0);
 
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();

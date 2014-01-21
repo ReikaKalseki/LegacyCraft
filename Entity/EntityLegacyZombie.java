@@ -171,6 +171,10 @@ public class EntityLegacyZombie extends EntityZombie {
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
 			}
 		}
+
+		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
+			this.setChild(false);
+		}
 	}
 
 	@Override
