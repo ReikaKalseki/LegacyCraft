@@ -40,7 +40,8 @@ public enum LegacyOptions implements ConfigList {
 	ENDERSOUNDS("New Angry Enderman Sounds", true), //1.4
 	ENDERBLOCKS("Allow Enderman Pickup of Cobble, Planks And Stone", false), //b1.9
 	//ENDERDAY("Allow Random Enderman Teleporting in Daylight", false); //1.2?; dummied out since not possible without base class edit
-	OLDBOOK("Old Book Recipe", true);
+	OLDBOOK("Old Book Recipe", true), //1.4
+	OLDMELON("Old Glistering Melon Recipe", true); //1.6
 
 	private String label;
 	private boolean defaultState;

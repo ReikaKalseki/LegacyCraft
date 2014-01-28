@@ -115,6 +115,15 @@ public class LegacyCraft extends DragonAPIMod {
 			GameRegistry.addRecipe(new ItemStack(Item.book), "P", "P", "P", 'P', Item.paper);
 		}
 
+		if (LegacyOptions.OLDBOOK.getState()) {
+			List<ShapedRecipes> li = ReikaRecipeHelper.getShapedRecipesByOutput(new ItemStack(Item.speckledMelon.itemID, 1, 0));
+			for (int i = 0; i < li.size(); i++) {
+				ShapedRecipes ir = li.get(i);
+				CraftingManager.getInstance().getRecipeList().remove(ir);
+			}
+			GameRegistry.addShapelessRecipe(new ItemStack(Item.speckledMelon), Item.melon, Item.goldNugget);
+		}
+
 		TickRegistry.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
 	}
 
@@ -191,7 +200,7 @@ public class LegacyCraft extends DragonAPIMod {
 		ev.setResult(LegacyOptions.BACKUP.getState() ? Result.DENY : ev.getResult());
 	}
 
-	@ForgeSubscribe(priority = EventPriority.LOWEST)
+	@ForgeSubscribe(priority = EventPriority.LOWEST, receiveCanceled = true)
 	public void bonemeal(BonemealEvent evt) {
 		if (LegacyOptions.BONEMEAL.getState()) {
 			if (evt.ID == Block.sapling.blockID) {
