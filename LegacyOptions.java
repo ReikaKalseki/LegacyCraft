@@ -117,4 +117,24 @@ public enum LegacyOptions implements ConfigList {
 		return type == null;
 	}
 
+	@Override
+	public boolean getDefaultState() {
+		return defaultState;
+	}
+
+	@Override
+	public int getDefaultValue() {
+		return defaultValue;
+	}
+
+	@Override
+	public float getDefaultFloat() {
+		return defaultFloat;
+	}
+
+	@Override
+	public boolean isEnforcingDefaults() {
+		return false;
+	}
+
 }
