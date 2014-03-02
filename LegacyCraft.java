@@ -9,6 +9,7 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +25,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenHills;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.EventPriority;
@@ -37,6 +41,7 @@ import Reika.DragonAPI.Instantiable.IO.ControlledConfig;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
+import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
 import Reika.LegacyCraft.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Entity.EntityLegacySkeleton;
@@ -122,6 +127,19 @@ public class LegacyCraft extends DragonAPIMod {
 				CraftingManager.getInstance().getRecipeList().remove(ir);
 			}
 			GameRegistry.addShapelessRecipe(new ItemStack(Item.speckledMelon), Item.melon, Item.goldNugget);
+		}
+
+		if (LegacyOptions.SILVERFISH.getState()) {
+			BiomeGenHills ex = (BiomeGenHills)BiomeGenBase.extremeHills;
+			Class c = BiomeGenHills.class;
+			WorldGenMinable dummy = new WorldGenMinable(Block.stone.blockID, 0);
+			Field f = ReikaObfuscationHelper.getField("theWorldGenerator");
+			try {
+				f.set(ex, dummy);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		TickRegistry.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
