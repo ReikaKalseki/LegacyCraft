@@ -131,11 +131,13 @@ public class LegacyCraft extends DragonAPIMod {
 
 		if (LegacyOptions.SILVERFISH.getState()) {
 			BiomeGenHills ex = (BiomeGenHills)BiomeGenBase.extremeHills;
+			BiomeGenHills ex2 = (BiomeGenHills)BiomeGenBase.extremeHillsEdge;
 			Class c = BiomeGenHills.class;
 			WorldGenMinable dummy = new WorldGenMinable(Block.stone.blockID, 0);
 			Field f = ReikaObfuscationHelper.getField("theWorldGenerator");
 			try {
 				f.set(ex, dummy);
+				f.set(ex2, dummy);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
