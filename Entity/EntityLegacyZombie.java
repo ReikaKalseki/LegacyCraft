@@ -64,7 +64,8 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
 			this.setVillager(false);
 		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
-			this.setChild(false);
+			//this.setChild(false);
+			this.setDead();
 
 		if (!LegacyOptions.MOBPICKUP.getState())
 			this.setCanPickUpLoot(false);
@@ -95,8 +96,9 @@ public class EntityLegacyZombie extends EntityZombie {
 
 		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
 			this.setVillager(false);
-		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
-			this.setChild(false);
+		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState())
+			//this.setChild(false);
+			this.setDead();
 	}
 
 	@Override
@@ -151,7 +153,8 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
 			this.setVillager(false);
 		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
-			this.setChild(false);
+			//this.setChild(false);
+			this.setDead();
 
 		if (!LegacyOptions.MOBPICKUP.getState())
 			this.setCanPickUpLoot(false);
@@ -173,7 +176,8 @@ public class EntityLegacyZombie extends EntityZombie {
 		}
 
 		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
-			this.setChild(false);
+			//this.setChild(false);
+			this.setDead();
 		}
 	}
 
