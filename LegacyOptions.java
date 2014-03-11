@@ -138,4 +138,9 @@ public enum LegacyOptions implements ConfigList {
 		return false;
 	}
 
+	@Override
+	public boolean shouldLoad() {
+		return true;
+	}
+
 }
