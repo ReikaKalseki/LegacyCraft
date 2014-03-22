@@ -151,6 +151,26 @@ public class LegacyCraft extends DragonAPIMod {
 	@EventHandler
 	public void postload(FMLPostInitializationEvent evt) {
 
+		if (LegacyOptions.OLDFIRE.getState()) {
+			try {
+				Field flammable = ReikaObfuscationHelper.getField("blockFlammability");
+				Field spread = ReikaObfuscationHelper.getField("blockFireSpreadSpeed");
+				int[] a1 = (int[])flammable.get(null);
+				int[] a2 = (int[])spread.get(null);
+				for (int i = 0; i < Block.blocksList.length; i++) {
+					if (Block.blocksList[i] != null) {
+						a1[i] *= 3;
+						a2[i] *= 3;
+					}
+				}
+				flammable.set(null, a1);
+				spread.set(null, a2);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@Override
