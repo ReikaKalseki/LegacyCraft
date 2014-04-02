@@ -7,7 +7,7 @@
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
  ******************************************************************************/
-package Reika.LegacyCraft.Entity;
+package Reika.LegacyCraft.Overrides.Entity;
 
 import java.lang.reflect.Field;
 import java.util.List;

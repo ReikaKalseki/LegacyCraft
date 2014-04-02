@@ -33,7 +33,6 @@ import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.EventPriority;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
-import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Base.DragonAPIMod;
@@ -42,11 +41,15 @@ import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
-import Reika.LegacyCraft.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Entity.EntityLegacySpider;
-import Reika.LegacyCraft.Entity.EntityLegacyZombie;
+import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
+import Reika.LegacyCraft.Overrides.BlockClosedPortal;
+import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
+import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySpider;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -144,6 +147,15 @@ public class LegacyCraft extends DragonAPIMod {
 			}
 		}
 
+		if (LegacyOptions.PIGPORTALS.getState()) {
+			Block.portal.setTickRandomly(false);
+		}
+
+		if (LegacyOptions.CLOSEDPORTALS.getState()) {
+			ReikaRegistryHelper.overrideBlock(instance, "portal", BlockClosedPortal.class);
+			ReikaRegistryHelper.overrideBlock(instance, "endPortal", BlockClosedEndPortal.class);
+		}
+
 		TickRegistry.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
 	}
 
@@ -209,7 +221,7 @@ public class LegacyCraft extends DragonAPIMod {
 			}
 		}
 	}
-
+	/*
 	@ForgeSubscribe(priority = EventPriority.LOWEST)
 	public void noZombieGroups(SummonAidEvent ev) {
 		ev.setResult(LegacyOptions.BACKUP.getState() ? Result.DENY : ev.getResult());
@@ -219,7 +231,7 @@ public class LegacyCraft extends DragonAPIMod {
 	public void noZombieRegen(SummonAidEvent ev) {
 		ev.setResult(LegacyOptions.BACKUP.getState() ? Result.DENY : ev.getResult());
 	}
-
+	 */
 	@ForgeSubscribe(priority = EventPriority.LOWEST, receiveCanceled = true)
 	public void bonemeal(BonemealEvent evt) {
 		if (LegacyOptions.BONEMEAL.getState()) {

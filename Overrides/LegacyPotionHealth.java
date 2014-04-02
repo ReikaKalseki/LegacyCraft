@@ -7,8 +7,9 @@
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
  ******************************************************************************/
-package Reika.LegacyCraft;
+package Reika.LegacyCraft.Overrides;
 
+import Reika.LegacyCraft.LegacyOptions;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionHealth;

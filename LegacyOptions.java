@@ -42,7 +42,9 @@ public enum LegacyOptions implements ConfigList {
 	//ENDERDAY("Allow Random Enderman Teleporting in Daylight", false); //1.2?; dummied out since not possible without base class edit
 	OLDBOOK("Old Book Recipe", true), //1.4
 	OLDMELON("Old Glistering Melon Recipe", true), //1.6
-	SILVERFISH("Disable silverfish stone in Extreme Hills", true); //1.4
+	SILVERFISH("Disable silverfish stone in Extreme Hills", true), //1.4
+	CLOSEDPORTALS("Disable Entities Travelling Through Portals", false), //1.3
+	PIGPORTALS("Disable Portal Pigmen Spawns", true); //1.4?
 
 	private String label;
 	private boolean defaultState;

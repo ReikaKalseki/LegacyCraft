@@ -18,10 +18,10 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.world.World;
-import Reika.LegacyCraft.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Entity.EntityLegacyZombie;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 
