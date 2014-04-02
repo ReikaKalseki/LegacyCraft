@@ -43,6 +43,7 @@ public enum LegacyOptions implements ConfigList {
 	OLDBOOK("Old Book Recipe", true), //1.4
 	OLDMELON("Old Glistering Melon Recipe", true), //1.6
 	SILVERFISH("Disable silverfish stone in Extreme Hills", true), //1.4
+	OLDFIRE("Original Fire Spread", false), //b1.6
 	CLOSEDPORTALS("Disable Entities Travelling Through Portals", false), //1.3
 	PIGPORTALS("Disable Portal Pigmen Spawns", true); //1.4?
 
