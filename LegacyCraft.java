@@ -33,6 +33,7 @@ import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.EventPriority;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.SummonAidEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Base.DragonAPIMod;
@@ -49,6 +50,7 @@ import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySpider;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -95,6 +97,7 @@ public class LegacyCraft extends DragonAPIMod {
 		EntityList.addMapping(EntityLegacyZombie.class, "Zombie", 54, 44975, 7969893);
 		EntityList.addMapping(EntityLegacySpider.class, "Spider", 52, 3419431, 11013646);
 		EntityList.addMapping(EntityLegacyEnderman.class, "Enderman", 58, 1447446, 0);
+		EntityList.addMapping(EntityLegacyVillager.class, "Villager", 120, 5651507, 12422002);
 
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();

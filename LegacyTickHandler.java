@@ -17,10 +17,12 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -43,17 +45,27 @@ public class LegacyTickHandler implements ITickHandler {
 				if (e.getClass() == EntityZombie.class) {
 					this.convertZombie(world, (EntityZombie)e);
 				}
-				if (e.getClass() == EntitySkeleton.class) {
+				else if (e.getClass() == EntitySkeleton.class) {
 					this.convertSkeleton(world, (EntitySkeleton)e);
 				}
-				if (e.getClass() == EntityCreeper.class) {
+				else if (e.getClass() == EntityCreeper.class) {
 					this.convertCreeper(world, (EntityCreeper)e);
 				}
-				if (e.getClass() == EntityEnderman.class) {
+				else if (e.getClass() == EntityEnderman.class) {
 					this.convertEnderman(world, (EntityEnderman)e);
+				}
+				else if (e.getClass() == EntityVillager.class) {
+					this.convertVillager(world, (EntityVillager)e);
 				}
 			}
 		}
+	}
+
+	private void convertVillager(World world, EntityVillager e) {
+		EntityLegacyVillager z = new EntityLegacyVillager(e);
+		e.setDead();
+		if (!world.isRemote)
+			world.spawnEntityInWorld(z);
 	}
 
 	private void convertEnderman(World world, EntityEnderman e) {

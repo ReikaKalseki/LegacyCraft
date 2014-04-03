@@ -45,7 +45,8 @@ public enum LegacyOptions implements ConfigList {
 	SILVERFISH("Disable silverfish stone in Extreme Hills", true), //1.4
 	OLDFIRE("Original Fire Spread", false), //b1.6
 	CLOSEDPORTALS("Disable Entities Travelling Through Portals", false), //1.3
-	PIGPORTALS("Disable Portal Pigmen Spawns", true); //1.4?
+	PIGPORTALS("Disable Portal Pigmen Spawns", true), //1.4?
+	SILENTVILLAGERS("Disable Villager Noises", false); //1.6
 
 	private String label;
 	private boolean defaultState;
