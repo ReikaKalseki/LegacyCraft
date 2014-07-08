@@ -43,6 +43,8 @@ import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
+import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
 import Reika.LegacyCraft.Overrides.BlockClosedPortal;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
@@ -247,12 +249,30 @@ public class LegacyCraft extends DragonAPIMod {
 	@ForgeSubscribe(priority = EventPriority.LOWEST, receiveCanceled = true)
 	public void bonemeal(BonemealEvent evt) {
 		if (LegacyOptions.BONEMEAL.getState()) {
+			Block b = Block.blocksList[evt.ID];
 			if (evt.ID == Block.sapling.blockID) {
 				BlockSapling sap = (BlockSapling)Block.sapling;
 				int meta = evt.world.getBlockMetadata(evt.X, evt.Y, evt.Z)+8;
 				evt.world.setBlockMetadataWithNotify(evt.X, evt.Y, evt.Z, meta, 3);
 				sap.markOrGrowMarked(evt.world, evt.X, evt.Y, evt.Z, new Random());
 				evt.setResult(Result.ALLOW);
+			}
+			else {
+				int meta = evt.world.getBlockMetadata(evt.X, evt.Y, evt.Z);
+				ReikaCropHelper crop = ReikaCropHelper.getCrop(evt.ID);
+				ModCropList mod = ModCropList.getModCrop(evt.ID, meta);
+				if (crop != null) {
+					int metato = crop.ripeMeta;
+					evt.world.setBlockMetadataWithNotify(evt.X, evt.Y, evt.Z, metato, 3);
+				}
+				else if (mod != null) {
+					if (mod == ModCropList.MAGIC) {
+						mod.makeRipe(evt.world, evt.X, evt.Y, evt.Z); //maybe want to specifically exclude magic crops?
+					}
+					else {
+						mod.makeRipe(evt.world, evt.X, evt.Y, evt.Z);
+					}
+				}
 			}
 		}
 	}
