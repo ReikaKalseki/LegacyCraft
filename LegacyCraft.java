@@ -83,7 +83,7 @@ public class LegacyCraft extends DragonAPIMod {
 		config.loadSubfolderedConfigFile(evt);
 		config.initProps(evt);
 
-		logger = new ModLogger(instance, LegacyOptions.LOGLOADING.getState(), LegacyOptions.DEBUGMODE.getState(), false);
+		logger = new ModLogger(instance, false);
 		MinecraftForge.TERRAIN_GEN_BUS.register(this);
 
 		this.basicSetup(evt);
@@ -267,7 +267,7 @@ public class LegacyCraft extends DragonAPIMod {
 				}
 				else if (mod != null) {
 					if (mod == ModCropList.MAGIC) {
-						mod.makeRipe(evt.world, evt.X, evt.Y, evt.Z); //maybe want to specifically exclude magic crops?
+						//mod.makeRipe(evt.world, evt.X, evt.Y, evt.Z); //maybe want to specifically exclude magic crops?
 					}
 					else {
 						mod.makeRipe(evt.world, evt.X, evt.Y, evt.Z);

@@ -15,8 +15,6 @@ import Reika.DragonAPI.Interfaces.ConfigList;
 
 public enum LegacyOptions implements ConfigList {
 
-	LOGLOADING("Console Loading Info", true),
-	DEBUGMODE("Debug Mode", false),
 	NEWAI("New Mob AI", false), //1.2
 	BABYZOMBIES("Disable Baby Zombies", true), //1.6
 	OLDRANGE("Old Zombie Sight Range", true), //1.6
