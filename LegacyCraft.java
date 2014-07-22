@@ -16,7 +16,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
@@ -38,7 +37,6 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Auxiliary.CommandableUpdateChecker;
 import Reika.DragonAPI.Base.DragonAPIMod;
-import Reika.DragonAPI.Instantiable.IO.ControlledConfig;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
@@ -49,12 +47,6 @@ import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
 import Reika.LegacyCraft.Overrides.BlockClosedPortal;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySpider;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -73,7 +65,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@Instance("LegacyCraft")
 	public static LegacyCraft instance = new LegacyCraft();
 
-	public static final ControlledConfig config = new ControlledConfig(instance, LegacyOptions.optionList, null, null, null, 1);
+	public static final LegacyConfig config = new LegacyConfig(instance, LegacyOptions.optionList, null, null, null, 1);
 
 	public static ModLogger logger;
 
@@ -93,12 +85,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		//Overrides vanilla
-		EntityList.addMapping(EntityLegacyCreeper.class, "Creeper", 50, 894731, 0);
-		EntityList.addMapping(EntityLegacySkeleton.class, "Skeleton", 51, 12698049, 4802889);
-		EntityList.addMapping(EntityLegacyZombie.class, "Zombie", 54, 44975, 7969893);
-		EntityList.addMapping(EntityLegacySpider.class, "Spider", 52, 3419431, 11013646);
-		EntityList.addMapping(EntityLegacyEnderman.class, "Enderman", 58, 1447446, 0);
-		EntityList.addMapping(EntityLegacyVillager.class, "Villager", 120, 5651507, 12422002);
+		MobOverrides.registerAll();
 
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();
