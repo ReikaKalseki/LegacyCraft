@@ -9,13 +9,14 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import net.minecraft.entity.EntityLivingData;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyOptions;
+
+import net.minecraft.entity.IEntityLivingData;
+import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 public class EntityLegacySpider extends EntitySpider {
 
@@ -24,14 +25,14 @@ public class EntityLegacySpider extends EntitySpider {
 	}
 
 	@Override
-	public EntityLivingData onSpawnWithEgg(EntityLivingData par1EntityLivingData)
+	public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1IEntityLivingData)
 	{
-		Object par1EntityLivingData1 = super.onSpawnWithEgg(par1EntityLivingData);
+		Object par1IEntityLivingData1 = super.onSpawnWithEgg(par1IEntityLivingData);
 
 		if (!LegacyOptions.SPIDERPOTIONS.getState())
 			this.clearActivePotions();
 
-		return (EntityLivingData)par1EntityLivingData1;
+		return (IEntityLivingData)par1IEntityLivingData1;
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class EntityLegacySpider extends EntitySpider {
 
 		if (!LegacyOptions.MOBPICKUP.getState()) {
 			for (int i = 0; i < 5; i++) {
-				ItemStack is = this.getCurrentItemOrArmor(i);
+				ItemStack is = this.getEquipmentInSlot(i);
 				this.setCurrentItemOrArmor(i, null);
 				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);

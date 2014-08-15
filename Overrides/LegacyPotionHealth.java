@@ -10,6 +10,7 @@
 package Reika.LegacyCraft.Overrides;
 
 import Reika.LegacyCraft.LegacyOptions;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionHealth;

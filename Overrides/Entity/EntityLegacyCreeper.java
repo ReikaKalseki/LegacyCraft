@@ -9,7 +9,11 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import java.lang.reflect.Field;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
+
 import java.util.List;
 
 import net.minecraft.entity.monster.EntityCreeper;
@@ -17,11 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
-import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyCreeper extends EntityCreeper {
 
@@ -39,7 +38,7 @@ public class EntityLegacyCreeper extends EntityCreeper {
 		motionY = e.motionY;
 		motionZ = e.motionZ;
 		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
 	}
@@ -55,20 +54,14 @@ public class EntityLegacyCreeper extends EntityCreeper {
 	{
 		super.fall(par1);
 		if (!LegacyOptions.CREEPERFALL.getState()) {
-			Field f = ReikaObfuscationHelper.getField("timeSinceIgnited");
-			try {
-				f.set(this, 0);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+			timeSinceIgnited = 0;
 		}
 	}
 
 	@Override
 	public void onUpdate() {
 
-		AxisAlignedBB box = AxisAlignedBB.getAABBPool().getAABB(posX, posY, posZ, posX, posY+this.getEyeHeight(), posZ).expand(2, 2, 2);
+		AxisAlignedBB box = AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX, posY+this.getEyeHeight(), posZ).expand(2, 2, 2);
 		List<EntityPlayer> li = worldObj.getEntitiesWithinAABB(EntityPlayer.class, box);
 		boolean flag = false;
 		for (int i = 0; i < li.size(); i++) {
@@ -87,7 +80,7 @@ public class EntityLegacyCreeper extends EntityCreeper {
 
 		if (!LegacyOptions.MOBPICKUP.getState()) {
 			for (int i = 0; i < 5; i++) {
-				ItemStack is = this.getCurrentItemOrArmor(i);
+				ItemStack is = this.getEquipmentInSlot(i);
 				this.setCurrentItemOrArmor(i, null);
 				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
@@ -106,7 +99,7 @@ public class EntityLegacyCreeper extends EntityCreeper {
 	{
 		for (int j = 0; j < this.getLastActiveItems().length; ++j)
 		{
-			ItemStack itemstack = this.getCurrentItemOrArmor(j);
+			ItemStack itemstack = this.getEquipmentInSlot(j);
 			boolean flag1 = equipmentDropChances[j] > 1.0F;
 
 			if (itemstack != null && (par1 || flag1) && rand.nextFloat() - par2 * 0.01F < equipmentDropChances[j])

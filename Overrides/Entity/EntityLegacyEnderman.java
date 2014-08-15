@@ -9,10 +9,11 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.world.World;
 import Reika.LegacyCraft.LegacyOptions;
+
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class EntityLegacyEnderman extends EntityEnderman {
 
@@ -27,9 +28,17 @@ public class EntityLegacyEnderman extends EntityEnderman {
 		motionY = e.motionY;
 		motionZ = e.motionZ;
 		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
+	}
+
+	@Override
+	public void onLivingUpdate() {
+		if (!LegacyOptions.ENDERSOUNDS.getState())
+			stareTimer = 100000;
+
+		super.onLivingUpdate();
 	}
 
 	@Override
@@ -37,30 +46,22 @@ public class EntityLegacyEnderman extends EntityEnderman {
 	{
 		return LegacyOptions.ENDERSOUNDS.getState() && super.isScreaming();
 	}
-	/*
-	private void setStareTimer(int time) {
-		ReikaObfuscationHelper.getField("stareTimer").set(this, time);
-	}
 
 	public int getStareTimer() {
-		return ReikaObfuscationHelper.getField("stareTimer").getInt(this);
-	}
-
-	private void setAggressive(boolean agg) {
-		ReikaObfuscationHelper.getField("isAggressive").set(this, agg);
+		return stareTimer;
 	}
 
 	public boolean isAggressive() {
-		return ReikaObfuscationHelper.getField("isAggressive").getBoolean(this);
+		return isAggressive;
 	}
-	 */
+
 	static
 	{
 		if (LegacyOptions.ENDERBLOCKS.getState()) {
-			carriableBlocks[Block.stone.blockID] = true;
-			carriableBlocks[Block.planks.blockID] = true;
-			carriableBlocks[Block.cobblestone.blockID] = true;
-			carriableBlocks[Block.stoneBrick.blockID] = true;
+			setCarriable(Blocks.stone, true);
+			setCarriable(Blocks.planks, true);
+			setCarriable(Blocks.cobblestone, true);
+			setCarriable(Blocks.stonebrick, true);
 		}
 	}
 

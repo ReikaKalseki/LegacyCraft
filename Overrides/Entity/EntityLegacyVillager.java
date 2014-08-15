@@ -9,9 +9,10 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
+import Reika.LegacyCraft.LegacyOptions;
+
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
-import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyVillager extends EntityVillager {
 
@@ -26,7 +27,7 @@ public class EntityLegacyVillager extends EntityVillager {
 		motionY = e.motionY;
 		motionZ = e.motionZ;
 		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
 	}

@@ -9,9 +9,10 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import net.minecraftforge.common.Configuration;
 import Reika.DragonAPI.Exception.RegistrationException;
 import Reika.DragonAPI.Interfaces.ConfigList;
+
+import net.minecraftforge.common.config.Configuration;
 
 public enum LegacyOptions implements ConfigList {
 

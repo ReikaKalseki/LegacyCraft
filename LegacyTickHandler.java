@@ -9,7 +9,14 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import java.util.EnumSet;
+import Reika.DragonAPI.Auxiliary.TickRegistry.TickHandler;
+import Reika.DragonAPI.Auxiliary.TickRegistry.TickType;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
+
 import java.util.List;
 
 import net.minecraft.entity.Entity;
@@ -19,15 +26,9 @@ import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
-public class LegacyTickHandler implements ITickHandler {
+public class LegacyTickHandler implements TickHandler {
 
 	public static final LegacyTickHandler instance = new LegacyTickHandler();
 
@@ -36,7 +37,7 @@ public class LegacyTickHandler implements ITickHandler {
 	}
 
 	@Override
-	public void tickStart(EnumSet<TickType> type, Object... tickData) {
+	public void tick(Object... tickData) {
 		World world = (World)tickData[0];
 		if (LegacyOptions.FORCEMOBS.getState()) {
 			List<Entity> li = world.loadedEntityList;
@@ -97,13 +98,13 @@ public class LegacyTickHandler implements ITickHandler {
 	}
 
 	@Override
-	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-
+	public TickType getType() {
+		return TickType.WORLD;
 	}
 
 	@Override
-	public EnumSet<TickType> ticks() {
-		return EnumSet.of(TickType.WORLD);
+	public Phase getPhase() {
+		return Phase.START;
 	}
 
 	@Override

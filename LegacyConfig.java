@@ -18,8 +18,8 @@ public class LegacyConfig extends ControlledConfig {
 
 	private boolean[] overrides = new boolean[MobOverrides.mobList.length];
 
-	public LegacyConfig(DragonAPIMod mod, ConfigList[] option, IDRegistry[] blocks, IDRegistry[] items, IDRegistry[] id, int cfg) {
-		super(mod, option, blocks, items, id, cfg);
+	public LegacyConfig(DragonAPIMod mod, ConfigList[] option, IDRegistry[] id, int cfg) {
+		super(mod, option, id, cfg);
 	}
 
 	@Override

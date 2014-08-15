@@ -9,8 +9,14 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
+import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
+
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingData;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIBreakDoor;
@@ -29,11 +35,6 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
-import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyZombie extends EntityZombie {
 
@@ -78,7 +79,7 @@ public class EntityLegacyZombie extends EntityZombie {
 		motionY = e.motionY;
 		motionZ = e.motionZ;
 		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
 	}
@@ -88,11 +89,11 @@ public class EntityLegacyZombie extends EntityZombie {
 	{
 		super.applyEntityAttributes();
 		if (LegacyOptions.OLDRANGE.getState()) {
-			this.getEntityAttribute(SharedMonsterAttributes.followRange).setAttribute(16.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(16.0D);
 		}
 
 		if (LegacyOptions.BABYZOMBIES.getState())
-			this.getAttributeMap().func_111150_b(field_110186_bp).setAttribute(0.0D);
+			this.getAttributeMap().registerAttribute(field_110186_bp).setBaseValue(0.0D);
 
 		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
 			this.setVillager(false);
@@ -140,9 +141,9 @@ public class EntityLegacyZombie extends EntityZombie {
 	}
 
 	@Override
-	public EntityLivingData onSpawnWithEgg(EntityLivingData par1EntityLivingData)
+	public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1IEntityLivingData)
 	{
-		Object par1EntityLivingData1 = super.onSpawnWithEgg(par1EntityLivingData);
+		Object par1IEntityLivingData1 = super.onSpawnWithEgg(par1IEntityLivingData);
 
 		this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).removeModifier(new AttributeModifier("Random spawn bonus", rand.nextDouble() * 0.05000000074505806D, 0));
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).removeModifier(new AttributeModifier("Random zombie-spawn bonus", rand.nextDouble() * 1.5D, 2));
@@ -159,7 +160,7 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (!LegacyOptions.MOBPICKUP.getState())
 			this.setCanPickUpLoot(false);
 
-		return (EntityLivingData)par1EntityLivingData1;
+		return (IEntityLivingData)par1IEntityLivingData1;
 	}
 
 	@Override
@@ -168,7 +169,7 @@ public class EntityLegacyZombie extends EntityZombie {
 
 		if (!LegacyOptions.MOBPICKUP.getState()) {
 			for (int i = 0; i < 5; i++) {
-				ItemStack is = this.getCurrentItemOrArmor(i);
+				ItemStack is = this.getEquipmentInSlot(i);
 				this.setCurrentItemOrArmor(i, null);
 				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
@@ -186,7 +187,7 @@ public class EntityLegacyZombie extends EntityZombie {
 	{
 		for (int j = 0; j < this.getLastActiveItems().length; ++j)
 		{
-			ItemStack itemstack = this.getCurrentItemOrArmor(j);
+			ItemStack itemstack = this.getEquipmentInSlot(j);
 			boolean flag1 = equipmentDropChances[j] > 1.0F;
 
 			if (itemstack != null && (par1 || flag1) && rand.nextFloat() - par2 * 0.01F < equipmentDropChances[j])

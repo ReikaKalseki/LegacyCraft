@@ -17,8 +17,8 @@ import net.minecraft.world.World;
 
 public class BlockClosedEndPortal extends BlockEndPortal {
 
-	public BlockClosedEndPortal(int par1, Material mat) {
-		super(par1, mat);
+	public BlockClosedEndPortal(Material mat) {
+		super(mat);
 	}
 
 	@Override

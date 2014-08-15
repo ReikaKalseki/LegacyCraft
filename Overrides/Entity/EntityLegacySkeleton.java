@@ -9,10 +9,15 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityLivingData;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.ai.EntityAIArrowAttack;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIFleeSun;
@@ -26,14 +31,10 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
-import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacySkeleton extends EntitySkeleton {
 
@@ -67,7 +68,7 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		motionY = e.motionY;
 		motionZ = e.motionZ;
 		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getCurrentItemOrArmor(i));
+			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
 	}
@@ -93,17 +94,17 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		}
 		if (this.getSkeletonType() != 1 && worldObj.provider.isHellWorld) { //No normal archer skeletons in the nether
 			this.setSkeletonType(1);
-			this.setCurrentItemOrArmor(0, new ItemStack(Item.swordStone));
+			this.setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
 		}
 	}
 
 	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase par1EntityLivingBase, float par2)
 	{
-		EntityArrow entityarrow = new EntityArrow(worldObj, this, par1EntityLivingBase, 1.6F, 14 - worldObj.difficultySetting * 4);
+		EntityArrow entityarrow = new EntityArrow(worldObj, this, par1EntityLivingBase, 1.6F, 14 - worldObj.difficultySetting.ordinal() * 4);
 		int i = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, this.getHeldItem());
 		int j = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, this.getHeldItem());
-		entityarrow.setDamage(par2 * 2.0F + rand.nextGaussian() * 0.25D + worldObj.difficultySetting * 0.11F);
+		entityarrow.setDamage(par2 * 2.0F + rand.nextGaussian() * 0.25D + worldObj.difficultySetting.ordinal() * 0.11F);
 
 		if (i > 0)
 		{
@@ -138,7 +139,7 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		tasks.removeTask(aiArrowAttack);
 		ItemStack itemstack = this.getHeldItem();
 
-		if (itemstack != null && itemstack.itemID == Item.bow.itemID)
+		if (itemstack != null && itemstack.getItem() == Items.bow)
 		{
 			tasks.addTask(4, aiArrowAttack);
 		}
@@ -149,27 +150,27 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 	}
 
 	@Override
-	public EntityLivingData onSpawnWithEgg(EntityLivingData par1EntityLivingData)
+	public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1IEntityLivingData)
 	{
-		par1EntityLivingData = super.onSpawnWithEgg(par1EntityLivingData);
+		par1IEntityLivingData = super.onSpawnWithEgg(par1IEntityLivingData);
 
 		if (worldObj.provider instanceof WorldProviderHell)
 		{
 			//tasks.addTask(4, aiAttackOnCollide);
 			this.setSkeletonType(1);
-			this.setCurrentItemOrArmor(0, new ItemStack(Item.swordStone));
+			this.setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
 		}
 		else
 		{
 			//tasks.addTask(4, aiArrowAttack);
-			this.setCurrentItemOrArmor(0, new ItemStack(Item.bow));
+			this.setCurrentItemOrArmor(0, new ItemStack(Items.bow));
 		}
 		this.setCombatTask();
 
 		if (!LegacyOptions.MOBPICKUP.getState())
 			this.setCanPickUpLoot(false);
 
-		return par1EntityLivingData;
+		return par1IEntityLivingData;
 	}
 
 	@Override
@@ -177,7 +178,7 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 	{
 		for (int j = 0; j < this.getLastActiveItems().length; ++j)
 		{
-			ItemStack itemstack = this.getCurrentItemOrArmor(j);
+			ItemStack itemstack = this.getEquipmentInSlot(j);
 			boolean flag1 = equipmentDropChances[j] > 1.0F;
 
 			if (itemstack != null && (par1 || flag1) && rand.nextFloat() - par2 * 0.01F < equipmentDropChances[j])
@@ -211,7 +212,7 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 
 		if (!LegacyOptions.MOBPICKUP.getState()) {
 			for (int i = 1; i < 5; i++) {
-				ItemStack is = this.getCurrentItemOrArmor(i);
+				ItemStack is = this.getEquipmentInSlot(i);
 				this.setCurrentItemOrArmor(i, null);
 				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
