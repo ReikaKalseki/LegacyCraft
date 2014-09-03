@@ -9,14 +9,13 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyOptions;
-
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacySpider extends EntitySpider {
 

@@ -9,12 +9,6 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
-import Reika.LegacyCraft.LegacyOptions;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -35,6 +29,11 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyZombie extends EntityZombie {
 

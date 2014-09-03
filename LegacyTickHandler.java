@@ -9,14 +9,6 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import Reika.DragonAPI.Auxiliary.TickRegistry.TickHandler;
-import Reika.DragonAPI.Auxiliary.TickRegistry.TickType;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
-
 import java.util.List;
 
 import net.minecraft.entity.Entity;
@@ -26,6 +18,13 @@ import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
+import Reika.DragonAPI.Auxiliary.TickRegistry.TickHandler;
+import Reika.DragonAPI.Auxiliary.TickRegistry.TickType;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
 public class LegacyTickHandler implements TickHandler {
@@ -103,8 +102,8 @@ public class LegacyTickHandler implements TickHandler {
 	}
 
 	@Override
-	public Phase getPhase() {
-		return Phase.START;
+	public boolean canFire(Phase p) {
+		return p == Phase.START;
 	}
 
 	@Override

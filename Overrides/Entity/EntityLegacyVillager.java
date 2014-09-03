@@ -9,10 +9,9 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import Reika.LegacyCraft.LegacyOptions;
-
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyVillager extends EntityVillager {
 

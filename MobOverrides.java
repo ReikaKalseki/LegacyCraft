@@ -9,6 +9,7 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import net.minecraft.entity.EntityLiving;
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
@@ -16,8 +17,6 @@ import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySpider;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
-
-import net.minecraft.entity.EntityLiving;
 
 public enum MobOverrides {
 

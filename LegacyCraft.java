@@ -9,20 +9,6 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import Reika.DragonAPI.DragonAPICore;
-import Reika.DragonAPI.Auxiliary.CommandableUpdateChecker;
-import Reika.DragonAPI.Auxiliary.TickRegistry;
-import Reika.DragonAPI.Base.DragonAPIMod;
-import Reika.DragonAPI.Instantiable.IO.ModLogger;
-import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
-import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
-import Reika.DragonAPI.ModRegistry.ModCropList;
-import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
-import Reika.LegacyCraft.Overrides.BlockClosedPortal;
-import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
-import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Random;
@@ -45,6 +31,19 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
+import Reika.DragonAPI.DragonAPICore;
+import Reika.DragonAPI.Auxiliary.CommandableUpdateChecker;
+import Reika.DragonAPI.Auxiliary.TickRegistry;
+import Reika.DragonAPI.Base.DragonAPIMod;
+import Reika.DragonAPI.Instantiable.IO.ModLogger;
+import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
+import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
+import Reika.DragonAPI.ModRegistry.ModCropList;
+import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
+import Reika.LegacyCraft.Overrides.BlockClosedPortal;
+import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
+import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -123,12 +122,14 @@ public class LegacyCraft extends DragonAPIMod {
 		}
 
 		if (LegacyOptions.SILVERFISH.getState()) {
-			BiomeGenHills ex = (BiomeGenHills)BiomeGenBase.extremeHills;
-			BiomeGenHills ex2 = (BiomeGenHills)BiomeGenBase.extremeHillsEdge;
-			Class c = BiomeGenHills.class;
-			WorldGenMinable dummy = new WorldGenMinable(Blocks.stone, 0);
-			ex.theWorldGenerator = dummy;
-			ex2.theWorldGenerator = dummy;
+			if (BiomeGenBase.extremeHills instanceof BiomeGenHills) { //Because BoP
+				BiomeGenHills ex = (BiomeGenHills)BiomeGenBase.extremeHills;
+				BiomeGenHills ex2 = (BiomeGenHills)BiomeGenBase.extremeHillsEdge;
+				Class c = BiomeGenHills.class;
+				WorldGenMinable dummy = new WorldGenMinable(Blocks.stone, 0);
+				ex.theWorldGenerator = dummy;
+				ex2.theWorldGenerator = dummy;
+			}
 		}
 
 		if (LegacyOptions.PIGPORTALS.getState()) {

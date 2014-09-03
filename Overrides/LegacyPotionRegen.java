@@ -9,9 +9,8 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides;
 
-import Reika.LegacyCraft.LegacyOptions;
-
 import net.minecraft.potion.Potion;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class LegacyPotionRegen extends Potion {
 

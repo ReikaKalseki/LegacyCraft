@@ -9,11 +9,6 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
-import Reika.LegacyCraft.LegacyOptions;
-
 import java.util.List;
 
 import net.minecraft.entity.monster.EntityCreeper;
@@ -21,6 +16,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyCreeper extends EntityCreeper {
 
