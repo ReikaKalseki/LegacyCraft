@@ -32,19 +32,20 @@ public enum LegacyOptions implements ConfigList {
 	MOBPICKUP("Mobs Pick Up Drops", false), //1.4
 	OLDPOTIONS("Old Regen and Heal Potions", true), //1.6
 	GOLDENAPPLE("Golden Apple Level 0 Uses Nuggets", true), //1.6
-	//HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5; dummied out since not possible without base class edit
+	HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5;
 	SPIDERPOTIONS("Spider Potion Effects on Spawn", false), //1.6
 	FORCEMOBS("Enforced Mob Controls", true),
 	ENDERSOUNDS("New Angry Enderman Sounds", true), //1.4
 	ENDERBLOCKS("Allow Enderman Pickup of Cobble, Planks And Stone", false), //b1.9
-	//ENDERDAY("Allow Random Enderman Teleporting in Daylight", false); //1.2?; dummied out since not possible without base class edit
+	ENDERDAY("Disable Random Enderman Teleporting in Daylight", true), //1.2?;
 	OLDBOOK("Old Book Recipe", true), //1.4
 	OLDMELON("Old Glistering Melon Recipe", true), //1.6
 	SILVERFISH("Disable silverfish stone in Extreme Hills", true), //1.4
 	OLDFIRE("Original Fire Spread", false), //b1.6
 	CLOSEDPORTALS("Disable Entities Travelling Through Portals", false), //1.3
 	PIGPORTALS("Disable Portal Pigmen Spawns", true), //1.4?
-	SILENTVILLAGERS("Disable Villager Noises", false); //1.6
+	SILENTVILLAGERS("Disable Villager Noises", false), //1.6
+	SUGARCANE("Disable Biome Colors on Sugarcane", true); //1.7
 
 	private String label;
 	private boolean defaultState;
