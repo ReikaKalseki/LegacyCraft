@@ -79,7 +79,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 		private static enum ClassPatch {
 			SUGARCANE("net.minecraft.block.BlockReed", "ane"),
 			NETHERLAVA("net.minecraft.world.gen.ChunkProviderHell", "aqv"),
-			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "bhk");
+			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "bhk"),
+			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt");
 
 			private final String obfName;
 			private final String deobfName;
@@ -138,7 +139,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
-					//MethodNode m = ReikaASMHelper.getMethodByName(cn, "", "populate", "(Lnet/minecraft/world/chunk/IChunkProvider;II)V");
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_147419_a", "func_147419_a", "(II[Lnet/minecraft/block/Block;)V");
 					if (m == null) {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
@@ -196,7 +196,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							AbstractInsnNode ain = m.instructions.get(i);
 							if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
 								MethodInsnNode min = (MethodInsnNode)ain;
-								String func = FMLForgePlugin.RUNTIME_DEOBF ? "" : "getBrightness";
+								String func = FMLForgePlugin.RUNTIME_DEOBF ? "func_70013_c" : "getBrightness";
 								if (func.equals(min.name)) {
 									prep = true;
 								}
@@ -208,6 +208,30 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							}
 						}
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+					}
+					break;
+				}
+				case LIGHTMAP: {
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_78472_g", "updateLightmap", "(F)V");
+					if (m == null) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
+					}
+					else {
+						AbstractInsnNode loc = null;
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.IASTORE) {
+								loc = ain;
+							}
+						}
+						/*
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
+						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
+						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
+						 */
+						m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V"));
 					}
 					break;
 				}

@@ -45,7 +45,9 @@ public enum LegacyOptions implements ConfigList {
 	CLOSEDPORTALS("Disable Entities Travelling Through Portals", false), //1.3
 	PIGPORTALS("Disable Portal Pigmen Spawns", true), //1.4?
 	SILENTVILLAGERS("Disable Villager Noises", false), //1.6
-	SUGARCANE("Disable Biome Colors on Sugarcane", true); //1.7
+	SUGARCANE("Disable Biome Colors on Sugarcane", true), //1.7
+	ROSES("Turn poppies into roses", true),
+	OLDLIGHT("Disable yellowed block light", false);
 
 	private String label;
 	private boolean defaultState;

@@ -14,19 +14,24 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraft.world.gen.feature.WorldGenMinable;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
@@ -38,6 +43,7 @@ import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
+import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
@@ -55,6 +61,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod( modid = "LegacyCraft", name="LegacyCraft", version="beta", certificateFingerprint = "@GET_FINGERPRINT@", dependencies="required-after:DragonAPI")
 
@@ -132,6 +139,13 @@ public class LegacyCraft extends DragonAPIMod {
 			}
 		}
 
+		if (LegacyOptions.ROSES.getState()) {
+			ItemMultiTexture item = (ItemMultiTexture)Item.getItemFromBlock(Blocks.red_flower);
+			item.field_150942_c[0] = "rose";
+			BlockFlower.field_149859_a[0] = "rose";
+			BlockFlower.field_149860_M[1][0] = "rose";
+		}
+
 		if (LegacyOptions.PIGPORTALS.getState()) {
 			Blocks.portal.setTickRandomly(false);
 		}
@@ -142,6 +156,14 @@ public class LegacyCraft extends DragonAPIMod {
 		}
 
 		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void setIcons(TextureStitchEvent evt) {
+		if (evt.map.getTextureType() == 0) {
+			Blocks.red_flower.field_149861_N[0] = evt.map.registerIcon("legacycraft:rose");
+		}
 	}
 
 	@Override
@@ -247,6 +269,21 @@ public class LegacyCraft extends DragonAPIMod {
 			}
 		}
 	}
+
+	@SideOnly(Side.CLIENT)
+	public static void adjustLightMap() {
+		if (LegacyOptions.OLDLIGHT.getState()) {
+			int[] colors = Minecraft.getMinecraft().entityRenderer.lightmapColors;
+			for (int i = 0; i < colors.length; i++) {
+				int color = colors[i];
+				int[] c = ReikaColorAPI.HexToRGB(color);
+				int avg = (c[0]+c[1]+c[2])/3;
+				color = 0xff000000 | ReikaColorAPI.GStoHex(avg);
+				colors[i] = color;
+			}
+		}
+	}
+
 	/*
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void noHiddenLava(PopulateChunkEvent.Populate ev) {
