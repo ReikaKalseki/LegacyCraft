@@ -174,9 +174,11 @@ public class LegacyCraft extends DragonAPIMod {
 			for (Object o : Block.blockRegistry.getKeys()) {
 				String name = (String)o;
 				Block b = Block.getBlockFromName(name);
-				int spread = Blocks.fire.getEncouragement(b);
-				int flamm = Blocks.fire.getFlammability(b);
-				Blocks.fire.setFireInfo(b, spread*3, flamm*3);
+				if (b != Blocks.air) {
+					int spread = Blocks.fire.getEncouragement(b);
+					int flamm = Blocks.fire.getFlammability(b);
+					Blocks.fire.setFireInfo(b, spread*3, flamm*3);
+				}
 			}
 		}
 
