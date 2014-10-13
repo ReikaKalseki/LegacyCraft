@@ -243,7 +243,7 @@ public class LegacyCraft extends DragonAPIMod {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 	public void bonemeal(BonemealEvent evt) {
-		if (LegacyOptions.BONEMEAL.getState()) {
+		if (LegacyOptions.BONEMEAL.getState() && !evt.world.isRemote) {
 			Block b = evt.block;
 			if (b == Blocks.sapling) {
 				BlockSapling sap = (BlockSapling)Blocks.sapling;
@@ -262,6 +262,9 @@ public class LegacyCraft extends DragonAPIMod {
 				}
 				else if (mod != null) {
 					if (mod == ModCropList.MAGIC) {
+						//mod.makeRipe(evt.world, evt.x, evt.y, evt.z); //maybe want to specifically exclude magic crops?
+					}
+					else if (mod == ModCropList.OREBERRY) {
 						//mod.makeRipe(evt.world, evt.x, evt.y, evt.z); //maybe want to specifically exclude magic crops?
 					}
 					else {

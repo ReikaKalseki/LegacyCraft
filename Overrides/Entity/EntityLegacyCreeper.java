@@ -63,8 +63,7 @@ public class EntityLegacyCreeper extends EntityCreeper {
 		AxisAlignedBB box = AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX, posY+this.getEyeHeight(), posZ).expand(2, 2, 2);
 		List<EntityPlayer> li = worldObj.getEntitiesWithinAABB(EntityPlayer.class, box);
 		boolean flag = false;
-		for (int i = 0; i < li.size(); i++) {
-			EntityPlayer ep = li.get(0);
+		for (EntityPlayer ep : li) {
 			if (!ep.isDead && ep.getHealth() > 0 && !ep.capabilities.isCreativeMode)
 				flag = true;
 		}
