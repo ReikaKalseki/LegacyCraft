@@ -226,7 +226,8 @@ public class LegacyCraft extends DragonAPIMod {
 		if (e instanceof EntityZombie) {
 			EntityZombie ez = (EntityZombie)e;
 			if (ez.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
-				ev.setResult(Result.DENY);
+				//ev.setResult(Result.DENY);
+				ez.setChild(false);
 			}
 		}
 	}
