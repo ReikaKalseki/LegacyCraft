@@ -36,7 +36,7 @@ public class LegacyTickHandler implements TickHandler {
 	}
 
 	@Override
-	public void tick(Object... tickData) {
+	public void tick(TickType type, Object... tickData) {
 		World world = (World)tickData[0];
 		if (LegacyOptions.FORCEMOBS.getState()) {
 			List<Entity> li = world.loadedEntityList;
