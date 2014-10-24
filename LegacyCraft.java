@@ -28,6 +28,8 @@ import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraft.world.gen.feature.WorldGenMinable;
@@ -44,6 +46,7 @@ import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
+import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
@@ -162,7 +165,26 @@ public class LegacyCraft extends DragonAPIMod {
 	@SideOnly(Side.CLIENT)
 	public void setIcons(TextureStitchEvent evt) {
 		if (evt.map.getTextureType() == 0) {
-			Blocks.red_flower.field_149861_N[0] = evt.map.registerIcon("legacycraft:rose");
+			if (LegacyOptions.ROSES.getState())
+				Blocks.red_flower.field_149861_N[0] = evt.map.registerIcon("legacycraft:rose");
+
+			if (LegacyOptions.ALPHAGRASS.getState()) {
+				Blocks.grass.field_149994_N = evt.map.registerIcon("legacycraft:alpha/grass_side");
+				Blocks.grass.blockIcon = evt.map.registerIcon("legacycraft:alpha/grass_side");
+				Blocks.grass.field_149991_b = evt.map.registerIcon("legacycraft:alpha/grass_top");
+
+				for (int m = 0; m < 4; m++) {
+					for (int i = 0; i <= 1; i++) {
+						String alpha = i == 0 ? "trans" : "opq";
+						String s = "legacycraft:alpha/leaves"+m+"_"+alpha;
+						Blocks.leaves.field_150129_M[i][m] = evt.map.registerIcon(s);
+					}
+				}
+
+				int[] data = ReikaArrayHelper.getArrayOf(0xffffff, 65536);
+				ColorizerGrass.setGrassBiomeColorizer(data);
+				ColorizerFoliage.setFoliageBiomeColorizer(data);
+			}
 		}
 	}
 
