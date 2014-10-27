@@ -80,7 +80,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SUGARCANE("net.minecraft.block.BlockReed", "ane"),
 			NETHERLAVA("net.minecraft.world.gen.ChunkProviderHell", "aqv"),
 			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "bhk"),
-			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt");
+			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt"),
+			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx");
 
 			private final String obfName;
 			private final String deobfName;
@@ -235,6 +236,83 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					}
 					break;
 				}
+				case FOLIAGE:
+					if (!getConfig("Alpha Grass and Leaf Color") || true) { //for some reason not working
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_77469_b", "getFoliageColorBirch", "()I");
+					if (m == null) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 1 for "+this+" ASM handler!");
+					}
+					else {
+						AbstractInsnNode loc = null;
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.LDC) {
+								loc = ain;
+								break;
+							}
+						}
+						/*
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
+						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
+						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
+						 */
+						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+						m.instructions.remove(loc);
+					}
+
+					m = ReikaASMHelper.getMethodByName(cn, "func_77466_a", "getFoliageColorPine", "()I");
+					if (m == null) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 2 for "+this+" ASM handler!");
+					}
+					else {
+						AbstractInsnNode loc = null;
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.LDC) {
+								loc = ain;
+								break;
+							}
+						}
+						/*
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
+						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
+						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
+						 */
+						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+						m.instructions.remove(loc);
+					}
+
+					m = ReikaASMHelper.getMethodByName(cn, "func_77468_c", "getFoliageColorBasic", "()I");
+					if (m == null) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 3 for "+this+" ASM handler!");
+					}
+					else {
+						AbstractInsnNode loc = null;
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.LDC) {
+								loc = ain;
+								break;
+							}
+						}
+						/*
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
+						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
+						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
+						 */
+						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+						m.instructions.remove(loc);
+					}
+					break;
 				}
 				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/);
 				cn.accept(writer);

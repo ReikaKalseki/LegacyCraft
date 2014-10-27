@@ -10,6 +10,7 @@
 package Reika.LegacyCraft;
 
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -17,6 +18,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
@@ -173,17 +176,43 @@ public class LegacyCraft extends DragonAPIMod {
 				Blocks.grass.blockIcon = evt.map.registerIcon("legacycraft:alpha/grass_side");
 				Blocks.grass.field_149991_b = evt.map.registerIcon("legacycraft:alpha/grass_top");
 
-				for (int m = 0; m < 4; m++) {
+				for (int m = 0; m <= 3; m++) {
 					for (int i = 0; i <= 1; i++) {
 						String alpha = i == 0 ? "trans" : "opq";
-						String s = "legacycraft:alpha/leaves"+m+"_"+alpha;
+						String s = "legacycraft:alpha/leaf_"+/*m*/0+"_"+alpha;
 						Blocks.leaves.field_150129_M[i][m] = evt.map.registerIcon(s);
 					}
 				}
 
+				for (int m = 0; m <= 1; m++) {
+					for (int i = 0; i <= 1; i++) {
+						String alpha = i == 0 ? "trans" : "opq";
+						String s = "legacycraft:alpha/leaf_"+0+"_"+alpha;//"legacycraft:alpha/leaf2_"+m+"_"+alpha;
+						Blocks.leaves2.field_150129_M[i][m] = evt.map.registerIcon(s);
+					}
+				}
+
+				for (int i = 1; i <= 2; i++) {
+					Blocks.tallgrass.field_149870_b[i] = evt.map.registerIcon("legacycraft:alpha/"+Blocks.tallgrass.field_149871_a[i]);
+				}
+
+				//for (int m = 0; m <= 5; m++) {
+				BlockSapling.field_149881_b[0] = evt.map.registerIcon("legacycraft:alpha/sapling");
+				//}
+				Blocks.vine.blockIcon = evt.map.registerIcon("legacycraft:alpha/vine");
+
 				int[] data = ReikaArrayHelper.getArrayOf(0xffffff, 65536);
 				ColorizerGrass.setGrassBiomeColorizer(data);
 				ColorizerFoliage.setFoliageBiomeColorizer(data);
+
+				SimpleReloadableResourceManager mgr = (SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager();
+				Iterator<IResourceManagerReloadListener> it = mgr.reloadListeners.iterator();
+				while (it.hasNext()) {
+					IResourceManagerReloadListener rl = it.next();
+					if (rl.getClass().getSimpleName().contains("ColorReloadListener")) {
+						it.remove();
+					}
+				}
 			}
 		}
 	}
