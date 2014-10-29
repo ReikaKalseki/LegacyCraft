@@ -16,6 +16,7 @@ import java.util.Map;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -72,8 +73,9 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 		private static final Configuration config = new Configuration(new File("/config/Reika/LegacyCraft/config.cfg"));
 
-		private static boolean getConfig(String sg) {
-			return config.get("control setup", sg, true).getBoolean(true);
+		private static boolean getConfig(String sg, boolean def) {
+			Property prop = config.get("control setup", sg, def);
+			return prop.getBoolean(def);
 		}
 
 		private static enum ClassPatch {
@@ -136,7 +138,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					break;
 				}
 				case NETHERLAVA: {
-					if (!getConfig("Disable Nether Hidden Lava Pockets")) {
+					if (!getConfig("Disable Nether Hidden Lava Pockets", true)) {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
@@ -180,7 +182,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					break;
 				}
 				case ENDERPORT: {
-					if (!getConfig("Disable Random Enderman Teleporting in Daylight")) {
+					if (!getConfig("Disable Random Enderman Teleporting in Daylight", true)) {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
@@ -237,7 +239,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					break;
 				}
 				case FOLIAGE:
-					if (!getConfig("Alpha Grass and Leaf Color") || true) { //for some reason not working
+					if (!getConfig("Alpha Grass and Leaf Color", false)) { //for some reason not working
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
