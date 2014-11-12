@@ -23,7 +23,7 @@ public enum LegacyOptions implements ConfigList {
 	BACKUP("Disable Zombie Reinforcements", true), //1.6
 	ZOMBIEDOOR("Zombies Break Doors", false), //1.2
 	ZOMBIEFIRE("Zombies Attack with Fire", false), //1.4
-	FIREARROWS("Allow Skeleton Flaming Arrows", false), //1.4?
+	FIREARROWS("Allow Skeleton Flaming Arrows", false), //1.4
 	ARROWSPEED("Old Skeleton Fire Rate", true), //1.4
 	CREEPERFALL("Creepers Explode on Fall", false), //1.5
 	BATS("Spawn Bats", false), //1.4
@@ -32,12 +32,12 @@ public enum LegacyOptions implements ConfigList {
 	MOBPICKUP("Mobs Pick Up Drops", false), //1.4
 	OLDPOTIONS("Old Regen and Heal Potions", true), //1.6
 	GOLDENAPPLE("Golden Apple Level 0 Uses Nuggets", true), //1.6
-	HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5;
+	HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5
 	SPIDERPOTIONS("Spider Potion Effects on Spawn", false), //1.6
 	FORCEMOBS("Enforced Mob Controls", true),
 	ENDERSOUNDS("New Angry Enderman Sounds", true), //1.4
 	ENDERBLOCKS("Allow Enderman Pickup of Cobble, Planks And Stone", false), //b1.9
-	ENDERDAY("Disable Random Enderman Teleporting in Daylight", true), //1.2?;
+	ENDERDAY("Disable Random Enderman Teleporting in Daylight", true), //1.2?
 	OLDBOOK("Old Book Recipe", true), //1.4
 	OLDMELON("Old Glistering Melon Recipe", true), //1.6
 	SILVERFISH("Disable silverfish stone in Extreme Hills", true), //1.4
@@ -46,10 +46,11 @@ public enum LegacyOptions implements ConfigList {
 	PIGPORTALS("Disable Portal Pigmen Spawns", true), //1.4?
 	SILENTVILLAGERS("Disable Villager Noises", false), //1.6
 	SUGARCANE("Disable Biome Colors on Sugarcane", true), //1.7
-	ROSES("Turn poppies into roses", true),
-	OLDLIGHT("Disable yellowed block light", false),
-	ALPHAGRASS("Alpha Grass and Leaf Color", false),
-	SHEEPUNCH("Old Sheep Wool Harvesting", false);
+	ROSES("Turn poppies into roses", true), //1.7
+	OLDLIGHT("Disable yellowed block light", false), //b1.8
+	ALPHAGRASS("Alpha Grass and Leaf Color", false), //a1.2
+	SHEEPUNCH("Old Sheep Wool Harvesting", false), //b1.7
+	ANIMALSPAWN("Pre Adventure Update Animal Spawning", false); //b1.8
 
 	private String label;
 	private boolean defaultState;

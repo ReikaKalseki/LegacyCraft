@@ -83,7 +83,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			NETHERLAVA("net.minecraft.world.gen.ChunkProviderHell", "aqv"),
 			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "bhk"),
 			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt"),
-			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx");
+			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx"),
+			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt");
 
 			private final String obfName;
 			private final String deobfName;
@@ -312,6 +313,38 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
 						 */
 						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+						m.instructions.remove(loc);
+					}
+					break;
+				case ANIMALSPAWN:
+					if (!getConfig("Pre Adventure Update Animal Spawning", false)) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					m = ReikaASMHelper.getMethodByName(cn, "func_72835_b", "tick", "()V");
+					if (m == null) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
+					}
+					else {
+						AbstractInsnNode loc = null;
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.LDC) {
+								LdcInsnNode ldc = (LdcInsnNode)ain;
+								if (ldc.cst instanceof Integer && ((Integer)ldc.cst).intValue() == 400) {
+									loc = ain;
+									break;
+								}
+							}
+						}
+						/*
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
+						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
+						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
+						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
+						 */
+						m.instructions.insert(loc, new LdcInsnNode(40));
 						m.instructions.remove(loc);
 					}
 					break;

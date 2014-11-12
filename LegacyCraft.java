@@ -44,6 +44,8 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Auxiliary.CommandableUpdateChecker;
 import Reika.DragonAPI.Auxiliary.TickRegistry;
@@ -53,6 +55,7 @@ import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
+import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.ModRegistry.ModCropList;
@@ -267,6 +270,15 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	public ModLogger getModLogger() {
 		return logger;
+	}
+
+	@SubscribeEvent()
+	public void animalSpawn(PopulateChunkEvent.Populate evt) {
+		if (evt.type == EventType.ANIMALS && LegacyOptions.ANIMALSPAWN.getState()) {
+			if (ReikaRandomHelper.doWithChance(80)) {
+				evt.setResult(Result.DENY);
+			}
+		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
