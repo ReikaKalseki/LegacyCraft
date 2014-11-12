@@ -20,10 +20,12 @@ import net.minecraft.block.BlockSapling;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -40,6 +42,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Auxiliary.CommandableUpdateChecker;
@@ -51,6 +54,7 @@ import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
+import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
 import Reika.LegacyCraft.Overrides.BlockClosedPortal;
@@ -279,6 +283,23 @@ public class LegacyCraft extends DragonAPIMod {
 			if (ez.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
 				//ev.setResult(Result.DENY);
 				ez.setChild(false);
+			}
+		}
+	}
+
+	@SubscribeEvent()
+	public void sheepPunch(AttackEntityEvent ev) {
+		if (LegacyOptions.SHEEPUNCH.getState()) {
+			Entity e = ev.target;
+			if (e instanceof EntitySheep) {
+				EntitySheep es = (EntitySheep)e;
+				if (!es.getSheared() && !es.isChild() && es.getHealth() > 0) {
+					int n = 1+es.worldObj.rand.nextInt(3);
+					for (int i = 0; i < n; i++) {
+						ReikaItemHelper.dropItem(es.worldObj, es.posX, es.posY+0.5, es.posZ, new ItemStack(Blocks.wool, 1, es.getFleeceColor()));
+					}
+					es.setSheared(true);
+				}
 			}
 		}
 	}

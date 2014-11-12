@@ -48,7 +48,8 @@ public enum LegacyOptions implements ConfigList {
 	SUGARCANE("Disable Biome Colors on Sugarcane", true), //1.7
 	ROSES("Turn poppies into roses", true),
 	OLDLIGHT("Disable yellowed block light", false),
-	ALPHAGRASS("Alpha Grass and Leaf Color", false);
+	ALPHAGRASS("Alpha Grass and Leaf Color", false),
+	SHEEPUNCH("Old Sheep Wool Harvesting", false);
 
 	private String label;
 	private boolean defaultState;
