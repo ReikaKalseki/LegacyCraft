@@ -184,7 +184,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						Iterator<AbstractInsnNode> it = m.instructions.iterator();
 						//String lava = FMLForgePlugin.RUNTIME_DEOBF ? "" : "flowing_lava";
 						//String water = FMLForgePlugin.RUNTIME_DEOBF ? "" : "water";
-						String gen = FMLForgePlugin.RUNTIME_DEOBF ? "" : "net/minecraft/world/gen/feature/WorldGenHellLava";
+						String gen = FMLForgePlugin.RUNTIME_DEOBF ? "ars" : "net/minecraft/world/gen/feature/WorldGenHellLava";
 						while (it.hasNext()) {
 							AbstractInsnNode ain = it.next();
 							/*
