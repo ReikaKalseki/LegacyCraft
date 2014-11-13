@@ -146,82 +146,30 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						return data;
 					}
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_73153_a", "populate", "(Lnet/minecraft/world/chunk/IChunkProvider;II)V");
-					//forge >> MethodNode m = ReikaASMHelper.getMethodByName(cn, "replaceBiomeBlocks", "replaceBiomeBlocks", "(II[Lnet/minecraft/block/Block;[B[Lnet/minecraft/world/biome/BiomeGenBase;)V");
 					if (m == null) {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
 					}
 					else {
-						//ReikaASMHelper.clearMethodBody(m);
-						//m.instructions.add(new InsnNode(Opcodes.ICONST_0));
-						//m.instructions.add(new InsnNode(Opcodes.IRETURN));
-
-						/*
-						int count = 0;
-						boolean prep = false;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.GETSTATIC) {
-								FieldInsnNode min = (FieldInsnNode)ain;
-								if ("QUARTZ".equals(min.name)) {
-									prep = true;
-								}
-							}
-							else if (prep && ain.getOpcode() == Opcodes.BIPUSH) {
-								if (count == 5) {
-									IntInsnNode ldc = (IntInsnNode)ain;
-									ldc.operand = Integer.MIN_VALUE;
-									break;
-								}
-								else {
-									count++;
-								}
-							}
-						}
-						 */
-
-						//ReikaASMHelper.removeCodeLine(m, 237);
-
 						Iterator<AbstractInsnNode> it = m.instructions.iterator();
-						//String lava = FMLForgePlugin.RUNTIME_DEOBF ? "" : "flowing_lava";
-						//String water = FMLForgePlugin.RUNTIME_DEOBF ? "" : "water";
 						String gen = FMLForgePlugin.RUNTIME_DEOBF ? "ars" : "net/minecraft/world/gen/feature/WorldGenHellLava";
 						while (it.hasNext()) {
 							AbstractInsnNode ain = it.next();
-							/*
-							if (ain.getOpcode() == Opcodes.GETSTATIC) {
-								FieldInsnNode fn = (FieldInsnNode)ain;
-								if (fn.name.equals(lava)) {
-									FieldInsnNode f2 = new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/init/Blocks", water, "Lnet/minecraft/block/Block;");
-									m.instructions.insert(fn, f2);
-									it.remove();
-									break;
-								}
-							}*/
 							if (ain.getOpcode() == Opcodes.NEW) {
 								TypeInsnNode tp = (TypeInsnNode)ain;
 								if (tp.desc.equals(gen)) {
 									tp.desc = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-									//TypeInsnNode t2 = new TypeInsnNode(Opcodes.NEW, "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava");
-									//m.instructions.insert(tp, t2);
-									//it.remove();
 								}
 							}
 							else if (ain.getOpcode() == Opcodes.INVOKESPECIAL) {
 								MethodInsnNode tp = (MethodInsnNode)ain;
 								if (tp.owner.equals(gen)) {
 									tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-									//MethodInsnNode t2 = new MethodInsnNode(Opcodes.INVOKESPECIAL, "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava", "<init>", "(Lnet/minecraft/block/Block;Z)V");
-									//m.instructions.insert(tp, t2);
-									//it.remove();
 								}
 							}
 							else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
 								MethodInsnNode tp = (MethodInsnNode)ain;
 								if (tp.owner.equals(gen)) {
 									tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-									//MethodInsnNode t2 = new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava", "FMLForgePlugin.RUNTIME_DEOBF ? "" : generate", "(Lnet/minecraft/world/World;Ljava/util/Random;III)Z");
-									//m.instructions.insert(tp, t2);
-									//it.remove();
 								}
 							}
 						}
