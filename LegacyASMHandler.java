@@ -83,7 +83,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 		private static enum ClassPatch {
 			SUGARCANE("net.minecraft.block.BlockReed", "ane"),
 			NETHERLAVA("net.minecraft.world.gen.ChunkProviderHell", "aqv"),
-			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "bhk"),
+			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "ya"),
 			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt"),
 			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx"),
 			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt");
