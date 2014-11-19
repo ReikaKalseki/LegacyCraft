@@ -105,39 +105,34 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				switch(this) {
 				case SUGARCANE: {
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149720_d", "colorMultiplier", "(Lnet/minecraft/world/IBlockAccess;III)I");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode start = null;
-						AbstractInsnNode ret = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain instanceof LineNumberNode) {
-								start = ain;
-							}
-							else if (ain.getOpcode() == Opcodes.IRETURN) {
-								ret = ain;
-							}
+					AbstractInsnNode start = null;
+					AbstractInsnNode ret = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain instanceof LineNumberNode) {
+							start = ain;
 						}
-						LabelNode l1 = new LabelNode();
-						LabelNode l2 = new LabelNode();
-						LabelNode l3 = new LabelNode();
-
-						m.instructions.remove(ret.getNext());
-						m.instructions.insert(ret, l3);
-						m.instructions.insertBefore(ret, l2);
-						m.instructions.insertBefore(ret, new FrameNode(Opcodes.F_SAME1, 0, null, 0, new Object[]{Opcodes.INTEGER}));
-
-						m.instructions.insert(start, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)); //does not use anything but opcode
-						m.instructions.insert(start, l1);
-						m.instructions.insert(start, new JumpInsnNode(Opcodes.GOTO, l2));
-						m.instructions.insert(start, new LdcInsnNode(0xffffff));
-						m.instructions.insert(start, new JumpInsnNode(Opcodes.IFEQ, l1));
-						m.instructions.insert(start, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z"));
-						m.instructions.insert(start, new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "SUGARCANE", "LReika/LegacyCraft/LegacyOptions;"));
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+						else if (ain.getOpcode() == Opcodes.IRETURN) {
+							ret = ain;
+						}
 					}
+					LabelNode l1 = new LabelNode();
+					LabelNode l2 = new LabelNode();
+					LabelNode l3 = new LabelNode();
+
+					m.instructions.remove(ret.getNext());
+					m.instructions.insert(ret, l3);
+					m.instructions.insertBefore(ret, l2);
+					m.instructions.insertBefore(ret, new FrameNode(Opcodes.F_SAME1, 0, null, 0, new Object[]{Opcodes.INTEGER}));
+
+					m.instructions.insert(start, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)); //does not use anything but opcode
+					m.instructions.insert(start, l1);
+					m.instructions.insert(start, new JumpInsnNode(Opcodes.GOTO, l2));
+					m.instructions.insert(start, new LdcInsnNode(0xffffff));
+					m.instructions.insert(start, new JumpInsnNode(Opcodes.IFEQ, l1));
+					m.instructions.insert(start, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z"));
+					m.instructions.insert(start, new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "SUGARCANE", "LReika/LegacyCraft/LegacyOptions;"));
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				case NETHERLAVA: {
@@ -146,36 +141,31 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						return data;
 					}
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_73153_a", "populate", "(Lnet/minecraft/world/chunk/IChunkProvider;II)V");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
-					}
-					else {
-						Iterator<AbstractInsnNode> it = m.instructions.iterator();
-						String gen = FMLForgePlugin.RUNTIME_DEOBF ? "ars" : "net/minecraft/world/gen/feature/WorldGenHellLava";
-						while (it.hasNext()) {
-							AbstractInsnNode ain = it.next();
-							if (ain.getOpcode() == Opcodes.NEW) {
-								TypeInsnNode tp = (TypeInsnNode)ain;
-								if (tp.desc.equals(gen)) {
-									tp.desc = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-								}
-							}
-							else if (ain.getOpcode() == Opcodes.INVOKESPECIAL) {
-								MethodInsnNode tp = (MethodInsnNode)ain;
-								if (tp.owner.equals(gen)) {
-									tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-								}
-							}
-							else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-								MethodInsnNode tp = (MethodInsnNode)ain;
-								if (tp.owner.equals(gen)) {
-									tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
-								}
+					Iterator<AbstractInsnNode> it = m.instructions.iterator();
+					String gen = FMLForgePlugin.RUNTIME_DEOBF ? "ars" : "net/minecraft/world/gen/feature/WorldGenHellLava";
+					while (it.hasNext()) {
+						AbstractInsnNode ain = it.next();
+						if (ain.getOpcode() == Opcodes.NEW) {
+							TypeInsnNode tp = (TypeInsnNode)ain;
+							if (tp.desc.equals(gen)) {
+								tp.desc = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
 							}
 						}
-
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+						else if (ain.getOpcode() == Opcodes.INVOKESPECIAL) {
+							MethodInsnNode tp = (MethodInsnNode)ain;
+							if (tp.owner.equals(gen)) {
+								tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
+							}
+						}
+						else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+							MethodInsnNode tp = (MethodInsnNode)ain;
+							if (tp.owner.equals(gen)) {
+								tp.owner = "Reika/LegacyCraft/Overrides/WorldGenCustomNetherLava";
+							}
+						}
 					}
+
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				case ENDERPORT: {
@@ -184,122 +174,88 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						return data;
 					}
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70636_d", "onLivingUpdate", "()V");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
-					}
-					else {/*
+					/*
 						for (int i = 214; i <= 223; i++) {
 							ReikaASMHelper.removeCodeLine(m, i);
 						}*/
-						boolean prep = false;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-								MethodInsnNode min = (MethodInsnNode)ain;
-								String func = FMLForgePlugin.RUNTIME_DEOBF ? "func_70013_c" : "getBrightness";
-								if (func.equals(min.name)) {
-									prep = true;
-								}
-							}
-							else if (prep && ain.getOpcode() == Opcodes.LDC) {
-								LdcInsnNode ldc = (LdcInsnNode)ain;
-								ldc.cst = Float.MAX_VALUE;
-								break;
+					boolean prep = false;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+							MethodInsnNode min = (MethodInsnNode)ain;
+							String func = FMLForgePlugin.RUNTIME_DEOBF ? "func_70013_c" : "getBrightness";
+							if (func.equals(min.name)) {
+								prep = true;
 							}
 						}
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+						else if (prep && ain.getOpcode() == Opcodes.LDC) {
+							LdcInsnNode ldc = (LdcInsnNode)ain;
+							ldc.cst = Float.MAX_VALUE;
+							break;
+						}
 					}
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				case LIGHTMAP: {
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_78472_g", "updateLightmap", "(F)V");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.IASTORE) {
-								loc = ain;
-							}
+					AbstractInsnNode loc = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.IASTORE) {
+							loc = ain;
 						}
-						/*
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
-						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
-						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-						 */
-						m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V"));
 					}
+
+					m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V"));
 					break;
 				}
-				case FOLIAGE:
+				case FOLIAGE: {
 					if (!getConfig("Alpha Grass and Leaf Color", false)) { //for some reason not working
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_77469_b", "getFoliageColorBirch", "()I");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 1 for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.LDC) {
-								loc = ain;
-								break;
-							}
+					AbstractInsnNode loc = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.LDC) {
+							loc = ain;
+							break;
 						}
-						/*
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
-						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
-						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-						 */
-						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
-						m.instructions.remove(loc);
 					}
+
+					m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+					m.instructions.remove(loc);
 
 					m = ReikaASMHelper.getMethodByName(cn, "func_77466_a", "getFoliageColorPine", "()I");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 2 for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.LDC) {
-								loc = ain;
-								break;
-							}
+
+					loc = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.LDC) {
+							loc = ain;
+							break;
 						}
-						/*
+					}
+					/*
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
 						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
 						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-						 */
-						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
-						m.instructions.remove(loc);
-					}
+					 */
+					m.instructions.insert(loc, new LdcInsnNode(0xffffff));
+					m.instructions.remove(loc);
 
 					m = ReikaASMHelper.getMethodByName(cn, "func_77468_c", "getFoliageColorBasic", "()I");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method 3 for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.LDC) {
-								loc = ain;
-								break;
-							}
+
+					loc = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.LDC) {
+							loc = ain;
+							break;
 						}
 						/*
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
@@ -311,39 +267,36 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
 						m.instructions.remove(loc);
 					}
-					break;
-				case ANIMALSPAWN:
+				}
+				break;
+				case ANIMALSPAWN: {
 					if (!getConfig("Pre Adventure Update Animal Spawning", false)) {
 						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
 						return data;
 					}
-					m = ReikaASMHelper.getMethodByName(cn, "func_72835_b", "tick", "()V");
-					if (m == null) {
-						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not find method for "+this+" ASM handler!");
-					}
-					else {
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.LDC) {
-								LdcInsnNode ldc = (LdcInsnNode)ain;
-								if (ldc.cst instanceof Integer && ((Integer)ldc.cst).intValue() == 400) {
-									loc = ain;
-									break;
-								}
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_72835_b", "tick", "()V");
+					AbstractInsnNode loc = null;
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.LDC) {
+							LdcInsnNode ldc = (LdcInsnNode)ain;
+							if (ldc.cst instanceof Integer && ((Integer)ldc.cst).intValue() == 400) {
+								loc = ain;
+								break;
 							}
 						}
-						/*
+					}
+					/*
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
 						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
 						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
 						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-						 */
-						m.instructions.insert(loc, new LdcInsnNode(40));
-						m.instructions.remove(loc);
-					}
+					 */
+					m.instructions.insert(loc, new LdcInsnNode(40));
+					m.instructions.remove(loc);
 					break;
+				}
 				}
 				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/);
 				cn.accept(writer);
