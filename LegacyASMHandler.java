@@ -36,9 +36,11 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaJavaLibrary;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+import cpw.mods.fml.relauncher.Side;
 
 @SortingIndex(1001)
 @MCVersion("1.7.10")
@@ -104,6 +106,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				classReader.accept(cn, 0);
 				switch(this) {
 				case SUGARCANE: {
+					if (FMLLaunchHandler.side() != Side.CLIENT)
+						break;
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149720_d", "colorMultiplier", "(Lnet/minecraft/world/IBlockAccess;III)I");
 					AbstractInsnNode start = null;
 					AbstractInsnNode ret = null;
