@@ -195,10 +195,10 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						else if (prep && ain.getOpcode() == Opcodes.LDC) {
 							LdcInsnNode ldc = (LdcInsnNode)ain;
 							ldc.cst = Float.MAX_VALUE;
+							ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 							break;
 						}
 					}
-					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				case LIGHTMAP: {
@@ -271,6 +271,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
 						m.instructions.remove(loc);
 					}
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 				}
 				break;
 				case ANIMALSPAWN: {
@@ -299,6 +300,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					 */
 					m.instructions.insert(loc, new LdcInsnNode(40));
 					m.instructions.remove(loc);
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				}
