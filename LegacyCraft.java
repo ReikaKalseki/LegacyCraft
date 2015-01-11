@@ -50,6 +50,7 @@ import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
 import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
 import Reika.DragonAPI.Base.DragonAPIMod;
+import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
@@ -90,6 +91,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	@EventHandler
 	public void preload(FMLPreInitializationEvent evt) {
+		this.startTiming(LoadPhase.PRELOAD);
 		config.loadSubfolderedConfigFile(evt);
 		config.initProps(evt);
 
@@ -97,11 +99,13 @@ public class LegacyCraft extends DragonAPIMod {
 		MinecraftForge.TERRAIN_GEN_BUS.register(this);
 
 		this.basicSetup(evt);
+		this.finishTiming();
 	}
 
 	@Override
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
+		this.startTiming(LoadPhase.LOAD);
 		//Overrides vanilla
 		MobOverrides.registerAll();
 
@@ -169,6 +173,7 @@ public class LegacyCraft extends DragonAPIMod {
 		}
 
 		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
+		this.finishTiming();
 	}
 
 	@SubscribeEvent
@@ -227,6 +232,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	@EventHandler
 	public void postload(FMLPostInitializationEvent evt) {
+		this.startTiming(LoadPhase.POSTLOAD);
 
 		if (LegacyOptions.OLDFIRE.getState()) {
 			for (Object o : Block.blockRegistry.getKeys()) {
@@ -240,6 +246,7 @@ public class LegacyCraft extends DragonAPIMod {
 			}
 		}
 
+		this.finishTiming();
 	}
 
 	@Override
