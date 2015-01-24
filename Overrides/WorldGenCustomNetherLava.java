@@ -26,7 +26,7 @@ public class WorldGenCustomNetherLava extends WorldGenerator
 
 	public WorldGenCustomNetherLava(Block gen, boolean upd)
 	{
-		genBlock = gen;
+		genBlock = Blocks.flowing_lava;//gen;
 		forceUpdate = upd;
 	}
 
