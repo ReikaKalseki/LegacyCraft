@@ -315,7 +315,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			if (!classes.isEmpty()) {
 				ClassPatch p = classes.get(className);
 				if (p != null) {
-					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Patching class "+className);
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Patching class "+p.deobfName);
 					opcodes = p.apply(opcodes);
 					classes.remove(className); //for maximizing performance
 				}
