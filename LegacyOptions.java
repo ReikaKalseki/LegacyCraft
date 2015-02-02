@@ -19,7 +19,7 @@ public enum LegacyOptions implements ConfigList {
 	BABYZOMBIES("Disable Baby Zombies", true), //1.6
 	OLDRANGE("Old Zombie Sight Range", true), //1.6
 	BONEMEAL("Old Bonemeal Mechanics", true), //1.5
-	VILLAGER("Zombies Target Villagers", false), //1.2
+	ZOMBIEVILLAGER("Zombies Target Villagers", false), //1.2
 	BACKUP("Disable Zombie Reinforcements", true), //1.6
 	ZOMBIEDOOR("Zombies Break Doors", false), //1.2
 	ZOMBIEFIRE("Zombies Attack with Fire", false), //1.4
@@ -50,7 +50,8 @@ public enum LegacyOptions implements ConfigList {
 	OLDLIGHT("Disable yellowed block light", false), //b1.8
 	ALPHAGRASS("Alpha Grass and Leaf Color", false), //a1.2
 	SHEEPUNCH("Old Sheep Wool Harvesting", false), //b1.7
-	ANIMALSPAWN("Pre Adventure Update Animal Spawning", false); //b1.8
+	ANIMALSPAWN("Pre Adventure Update Animal Spawning", false), //b1.8
+	HELDENCHANT("Allow Mobs to Hold Enchanted Weapons", true);
 
 	private String label;
 	private boolean defaultState;

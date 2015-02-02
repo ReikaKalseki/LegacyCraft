@@ -90,6 +90,14 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 	}
 
 	@Override
+	protected void enchantEquipment()
+	{
+		if (LegacyOptions.HELDENCHANT.getState()) {
+			super.enchantEquipment();
+		}
+	}
+
+	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase par1EntityLivingBase, float par2)
 	{
 		EntityArrow entityarrow = new EntityArrow(worldObj, this, par1EntityLivingBase, 1.6F, 14 - worldObj.difficultySetting.ordinal() * 4);

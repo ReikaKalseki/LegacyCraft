@@ -48,20 +48,20 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (LegacyOptions.ZOMBIEDOOR.getState())
 			tasks.addTask(1, new EntityAIBreakDoor(this));
 		tasks.addTask(2, new EntityAIAttackOnCollide(this, EntityPlayer.class, 1.0D, false));
-		if (LegacyOptions.VILLAGER.getState())
+		if (LegacyOptions.ZOMBIEVILLAGER.getState())
 			tasks.addTask(3, new EntityAIAttackOnCollide(this, EntityVillager.class, 1.0D, true));
 		tasks.addTask(4, new EntityAIMoveTowardsRestriction(this, 1.0D));
-		if (LegacyOptions.VILLAGER.getState())
+		if (LegacyOptions.ZOMBIEVILLAGER.getState())
 			tasks.addTask(5, new EntityAIMoveThroughVillage(this, 1.0D, false));
 		tasks.addTask(6, new EntityAIWander(this, 1.0D));
 		tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
 		tasks.addTask(7, new EntityAILookIdle(this));
 		targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
 		targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
-		if (LegacyOptions.VILLAGER.getState())
+		if (LegacyOptions.ZOMBIEVILLAGER.getState())
 			targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityVillager.class, 0, false));
 
-		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
+		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
 			this.setVillager(false);
 		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
 			//this.setChild(false);
@@ -84,6 +84,14 @@ public class EntityLegacyZombie extends EntityZombie {
 	}
 
 	@Override
+	protected void enchantEquipment()
+	{
+		if (LegacyOptions.HELDENCHANT.getState()) {
+			super.enchantEquipment();
+		}
+	}
+
+	@Override
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
@@ -94,7 +102,7 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (LegacyOptions.BABYZOMBIES.getState())
 			this.getAttributeMap().registerAttribute(field_110186_bp).setBaseValue(0.0D);
 
-		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
+		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
 			this.setVillager(false);
 		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState())
 			//this.setChild(false);
@@ -132,7 +140,7 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (flag && this.isBurning() && !LegacyOptions.ZOMBIEFIRE.getState()) {
 			e.extinguish();
 		}
-		if (e instanceof EntityVillager && !LegacyOptions.VILLAGER.getState()) {
+		if (e instanceof EntityVillager && !LegacyOptions.ZOMBIEVILLAGER.getState()) {
 			float f = (float)this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
 			((EntityVillager)e).heal(f);
 		}
@@ -150,7 +158,7 @@ public class EntityLegacyZombie extends EntityZombie {
 		this.getEntityAttribute(field_110186_bp).removeModifier(new AttributeModifier("Leader zombie bonus", rand.nextDouble() * 0.25D + 0.5D, 0));
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).removeModifier(new AttributeModifier("Leader zombie bonus", rand.nextDouble() * 3.0D + 1.0D, 2));
 
-		if (this.isVillager() && !LegacyOptions.VILLAGER.getState())
+		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
 			this.setVillager(false);
 		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
 			//this.setChild(false);

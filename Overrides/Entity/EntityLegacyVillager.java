@@ -9,6 +9,11 @@
  ******************************************************************************/
 package Reika.LegacyCraft.Overrides.Entity;
 
+import java.util.Iterator;
+
+import net.minecraft.entity.ai.EntityAIAvoidEntity;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
 import Reika.LegacyCraft.LegacyOptions;
@@ -29,6 +34,24 @@ public class EntityLegacyVillager extends EntityVillager {
 			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
+
+		if (!LegacyOptions.ZOMBIEVILLAGER.getState() || !LegacyOptions.NEWAI.getState()) {
+			Iterator<EntityAITaskEntry> it = tasks.taskEntries.iterator();
+			while (it.hasNext()) {
+				EntityAITaskEntry ai = it.next();
+				if (ai.action instanceof EntityAIAvoidEntity) {
+					EntityAIAvoidEntity ea = (EntityAIAvoidEntity)ai.action;
+					if (EntityZombie.class.isAssignableFrom(ea.targetEntityClass))
+						it.remove();
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean isAIEnabled()
+	{
+		return LegacyOptions.NEWAI.getState();
 	}
 
 	@Override

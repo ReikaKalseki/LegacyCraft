@@ -43,6 +43,14 @@ public class EntityLegacyCreeper extends EntityCreeper {
 	}
 
 	@Override
+	protected void enchantEquipment()
+	{
+		if (LegacyOptions.HELDENCHANT.getState()) {
+			super.enchantEquipment();
+		}
+	}
+
+	@Override
 	public boolean isAIEnabled()
 	{
 		return LegacyOptions.NEWAI.getState();

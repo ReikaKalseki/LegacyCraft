@@ -48,4 +48,12 @@ public class EntityLegacySpider extends EntitySpider {
 		}
 	}
 
+	@Override
+	protected void enchantEquipment()
+	{
+		if (LegacyOptions.HELDENCHANT.getState()) {
+			super.enchantEquipment();
+		}
+	}
+
 }
