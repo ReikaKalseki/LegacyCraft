@@ -26,6 +26,8 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -33,6 +35,7 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaJavaLibrary;
@@ -88,7 +91,10 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "ya"),
 			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt"),
 			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx"),
-			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt");
+			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt"),
+			PORTAL1("net.minecraft.block.BlockPortal", "amp"),
+			PORTAL2("net.minecraft.block.BlockEndPortal", "akt"),
+			;
 
 			private final String obfName;
 			private final String deobfName;
@@ -178,10 +184,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						return data;
 					}
 					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70636_d", "onLivingUpdate", "()V");
-					/*
-						for (int i = 214; i <= 223; i++) {
-							ReikaASMHelper.removeCodeLine(m, i);
-						}*/
 					boolean prep = false;
 					for (int i = 0; i < m.instructions.size(); i++) {
 						AbstractInsnNode ain = m.instructions.get(i);
@@ -242,13 +244,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							break;
 						}
 					}
-					/*
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
-						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
-						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-					 */
 					m.instructions.insert(loc, new LdcInsnNode(0xffffff));
 					m.instructions.remove(loc);
 
@@ -261,13 +256,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							loc = ain;
 							break;
 						}
-						/*
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
-						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
-						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-						 */
 						m.instructions.insert(loc, new LdcInsnNode(0xffffff));
 						m.instructions.remove(loc);
 					}
@@ -291,15 +279,46 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							}
 						}
 					}
-					/*
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.IASTORE, 0));
-						m.instructions.insert(loc, new InsnNode(Opcodes.ICONST_0));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ILOAD, 3));
-						m.instructions.insert(loc, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "lightmapColors", "[I"));
-						m.instructions.insert(loc, new VarInsnNode(Opcodes.ALOAD, 0));
-					 */
 					m.instructions.insert(loc, new LdcInsnNode(40));
 					m.instructions.remove(loc);
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+					break;
+				}
+				case PORTAL1: {
+					if (!getConfig("Disable Entities Travelling Through Portals", false)) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149670_a", "onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
+					LabelNode l1 = new LabelNode();
+					LabelNode l2 = new LabelNode();
+					InsnList insert = new InsnList();
+					insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
+					insert.add(new TypeInsnNode(Opcodes.INSTANCEOF, "net/minecraft/entity/player/EntityPlayer"));
+					insert.add(new JumpInsnNode(Opcodes.IFNE, l1));
+					insert.add(l2);
+					insert.add(new InsnNode(Opcodes.RETURN));
+					insert.add(l1);
+					m.instructions.insert(insert);
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+					break;
+				}
+				case PORTAL2: {
+					if (!getConfig("Disable Entities Travelling Through Portals", false)) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149670_a", "onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
+					LabelNode l1 = new LabelNode();
+					LabelNode l2 = new LabelNode();
+					InsnList insert = new InsnList();
+					insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
+					insert.add(new TypeInsnNode(Opcodes.INSTANCEOF, "net/minecraft/entity/player/EntityPlayer"));
+					insert.add(new JumpInsnNode(Opcodes.IFNE, l1));
+					insert.add(l2);
+					insert.add(new InsnNode(Opcodes.RETURN));
+					insert.add(l1);
+					m.instructions.insert(insert);
 					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}

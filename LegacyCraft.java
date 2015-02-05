@@ -53,15 +53,12 @@ import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
-import Reika.DragonAPI.Libraries.ReikaRegistryHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.ModRegistry.ModCropList;
-import Reika.LegacyCraft.Overrides.BlockClosedEndPortal;
-import Reika.LegacyCraft.Overrides.BlockClosedPortal;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
 import cpw.mods.fml.common.Mod;
@@ -166,11 +163,6 @@ public class LegacyCraft extends DragonAPIMod {
 
 		if (LegacyOptions.PIGPORTALS.getState()) {
 			Blocks.portal.setTickRandomly(false);
-		}
-
-		if (LegacyOptions.CLOSEDPORTALS.getState()) {
-			ReikaRegistryHelper.overrideBlock(instance, "portal", BlockClosedPortal.class);
-			ReikaRegistryHelper.overrideBlock(instance, "endPortal", BlockClosedEndPortal.class);
 		}
 
 		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
