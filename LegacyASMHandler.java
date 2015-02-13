@@ -140,7 +140,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					m.instructions.insert(start, new JumpInsnNode(Opcodes.GOTO, l2));
 					m.instructions.insert(start, new LdcInsnNode(0xffffff));
 					m.instructions.insert(start, new JumpInsnNode(Opcodes.IFEQ, l1));
-					m.instructions.insert(start, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z"));
+					m.instructions.insert(start, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
 					m.instructions.insert(start, new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "SUGARCANE", "LReika/LegacyCraft/LegacyOptions;"));
 					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
@@ -213,7 +213,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						}
 					}
 
-					m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V"));
+					m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V", false));
 					break;
 				}
 				case FOLIAGE: {
