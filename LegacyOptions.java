@@ -51,7 +51,8 @@ public enum LegacyOptions implements ConfigList {
 	ALPHAGRASS("Alpha Grass and Leaf Color", false), //a1.2
 	SHEEPUNCH("Old Sheep Wool Harvesting", false), //b1.7
 	ANIMALSPAWN("Pre Adventure Update Animal Spawning", false), //b1.8
-	HELDENCHANT("Allow Mobs to Hold Enchanted Weapons", true);
+	HELDENCHANT("Allow Mobs to Hold Enchanted Weapons", true),
+	NETHERICE("Enable Ice to Water in Nether", true);
 
 	private String label;
 	private boolean defaultState;

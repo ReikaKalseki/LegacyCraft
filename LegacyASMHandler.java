@@ -10,14 +10,24 @@
 package Reika.LegacyCraft;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.stats.StatList;
+import net.minecraft.world.World;
 import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -94,6 +104,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt"),
 			PORTAL1("net.minecraft.block.BlockPortal", "amp"),
 			PORTAL2("net.minecraft.block.BlockEndPortal", "akt"),
+			ICEBLOCK("net.minecraft.block.BlockIce", "alp"),
 			;
 
 			private final String obfName;
@@ -322,10 +333,100 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
+				case ICEBLOCK: {
+					if (!getConfig("Enable Ice to Water in Nether", true)) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					String hell = FMLForgePlugin.RUNTIME_DEOBF ? "field_76575_d" : "isHellWorld";
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149636_a", "harvestBlock", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;IIII)V");
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.GETFIELD) {
+							FieldInsnNode fin = (FieldInsnNode)ain;
+							if (fin.name.equals(hell)) {
+								boolean last = false;
+								while (!last) {
+									AbstractInsnNode next = fin.getNext();
+									last = next.getOpcode() == Opcodes.RETURN;
+									m.instructions.remove(next);
+								}
+								m.instructions.insert(fin, new InsnNode(Opcodes.POP));
+								ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler 1!");
+								break;
+							}
+						}
+					}
+
+					m = ReikaASMHelper.getMethodByName(cn, "func_149674_a", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+					for (int i = 0; i < m.instructions.size(); i++) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.GETFIELD) {
+							FieldInsnNode fin = (FieldInsnNode)ain;
+							if (fin.name.equals(hell)) {
+								boolean last = false;
+								while (!last) {
+									AbstractInsnNode next = fin.getNext();
+									last = next.getOpcode() == Opcodes.RETURN;
+									m.instructions.remove(next);
+								}
+								m.instructions.insert(fin, new InsnNode(Opcodes.POP));
+								ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler 2!");
+								break;
+							}
+						}
+					}
+					break;
+				}
 				}
 				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/);
 				cn.accept(writer);
 				return writer.toByteArray();
+			}
+		}
+
+		class test extends Block {
+			protected test(Material p_i45394_1_) {
+				super(p_i45394_1_);
+				// TODO Auto-generated constructor stub
+			}
+
+			@Override
+			public void harvestBlock(World world, EntityPlayer ep, int x, int y, int z, int meta)
+			{
+				ep.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock(this)], 1);
+				ep.addExhaustion(0.025F);
+
+				if (this.canSilkHarvest(world, ep, x, y, z, meta) && EnchantmentHelper.getSilkTouchModifier(ep))
+				{
+					ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+					ItemStack itemstack = this.createStackedBlock(meta);
+
+					if (itemstack != null) items.add(itemstack);
+
+					ForgeEventFactory.fireBlockHarvesting(items, world, this, x, y, z, meta, 0, 1.0f, true, ep);
+					for (ItemStack is : items)
+						this.dropBlockAsItem(world, x, y, z, is);
+				}
+				else
+				{
+					if (world.provider.isHellWorld)
+					{
+						world.setBlockToAir(x, y, z);
+						return;
+					}
+
+					int i1 = EnchantmentHelper.getFortuneModifier(ep);
+					harvesters.set(ep);
+					this.dropBlockAsItem(world, x, y, z, meta, i1);
+					harvesters.set(null);
+					Material material = world.getBlock(x, y - 1, z).getMaterial();
+
+					if (material.blocksMovement() || material.isLiquid())
+					{
+						world.setBlock(x, y, z, Blocks.flowing_water);
+					}
+				}
 			}
 		}
 
