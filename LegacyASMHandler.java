@@ -10,24 +10,14 @@
 package Reika.LegacyCraft;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.stats.StatList;
-import net.minecraft.world.World;
 import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.event.ForgeEventFactory;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -382,51 +372,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/);
 				cn.accept(writer);
 				return writer.toByteArray();
-			}
-		}
-
-		class test extends Block {
-			protected test(Material p_i45394_1_) {
-				super(p_i45394_1_);
-				// TODO Auto-generated constructor stub
-			}
-
-			@Override
-			public void harvestBlock(World world, EntityPlayer ep, int x, int y, int z, int meta)
-			{
-				ep.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock(this)], 1);
-				ep.addExhaustion(0.025F);
-
-				if (this.canSilkHarvest(world, ep, x, y, z, meta) && EnchantmentHelper.getSilkTouchModifier(ep))
-				{
-					ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-					ItemStack itemstack = this.createStackedBlock(meta);
-
-					if (itemstack != null) items.add(itemstack);
-
-					ForgeEventFactory.fireBlockHarvesting(items, world, this, x, y, z, meta, 0, 1.0f, true, ep);
-					for (ItemStack is : items)
-						this.dropBlockAsItem(world, x, y, z, is);
-				}
-				else
-				{
-					if (world.provider.isHellWorld)
-					{
-						world.setBlockToAir(x, y, z);
-						return;
-					}
-
-					int i1 = EnchantmentHelper.getFortuneModifier(ep);
-					harvesters.set(ep);
-					this.dropBlockAsItem(world, x, y, z, meta, i1);
-					harvesters.set(null);
-					Material material = world.getBlock(x, y - 1, z).getMaterial();
-
-					if (material.blocksMovement() || material.isLiquid())
-					{
-						world.setBlock(x, y, z, Blocks.flowing_water);
-					}
-				}
 			}
 		}
 
