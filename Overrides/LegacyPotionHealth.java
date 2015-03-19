@@ -19,6 +19,7 @@ public class LegacyPotionHealth extends PotionHealth {
 
 	public LegacyPotionHealth() {
 		super(Potion.heal.id, false, Potion.heal.getLiquidColor());
+		this.setPotionName(Potion.heal.getName());
 	}
 
 	@Override

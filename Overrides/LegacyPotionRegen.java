@@ -16,6 +16,7 @@ public class LegacyPotionRegen extends Potion {
 
 	public LegacyPotionRegen() {
 		super(Potion.regeneration.id, false, Potion.regeneration.getLiquidColor());
+		this.setPotionName(Potion.regeneration.getName());
 	}
 
 	@Override
