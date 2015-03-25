@@ -213,8 +213,13 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							loc = ain;
 						}
 					}
-
-					m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V", false));
+					if (loc != null) {
+						m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V", false));
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
+					}
+					else {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Could not apply "+this+" ASM handler; reference IASTORE not found!");
+					}
 					break;
 				}
 				case FOLIAGE: {
