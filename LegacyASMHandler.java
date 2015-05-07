@@ -95,6 +95,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			PORTAL1("net.minecraft.block.BlockPortal", "amp"),
 			PORTAL2("net.minecraft.block.BlockEndPortal", "akt"),
 			ICEBLOCK("net.minecraft.block.BlockIce", "alp"),
+			LAVAHISS("net.minecraft.block.BlockLiquid", "alw"),
 			;
 
 			private final String obfName;
@@ -371,6 +372,17 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							}
 						}
 					}
+					break;
+				}
+				case LAVAHISS: {
+					if (!getConfig("Lava Movement Hiss", true)) {
+						ReikaJavaLibrary.pConsole("LEGACYCRAFT: Not applying "+this+" ASM handler; disabled in config.");
+						return data;
+					}
+					MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149799_m", "func_149799_m", "(Lnet/minecraft/world/World;III)V");
+					m.instructions.clear();
+					m.instructions.add(new InsnNode(Opcodes.RETURN));
+					ReikaJavaLibrary.pConsole("LEGACYCRAFT: Successfully applied "+this+" ASM handler!");
 					break;
 				}
 				}
