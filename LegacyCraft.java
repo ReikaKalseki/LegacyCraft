@@ -22,6 +22,7 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
@@ -40,6 +41,7 @@ import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -47,6 +49,8 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 import Reika.DragonAPI.DragonAPICore;
+import Reika.DragonAPI.ModList;
+import Reika.DragonAPI.ASM.DependentMethodStripper.ModDependent;
 import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
 import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
 import Reika.DragonAPI.Base.DragonAPIMod;
@@ -58,9 +62,11 @@ import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.DragonAPI.ModInteract.ItemHandlers.TinkerBlockHandler;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -74,7 +80,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod( modid = "LegacyCraft", name="LegacyCraft", version="beta", certificateFingerprint = "@GET_FINGERPRINT@", dependencies="required-after:DragonAPI")
+@Mod( modid = "LegacyCraft", name="LegacyCraft", certificateFingerprint = "@GET_FINGERPRINT@", dependencies="required-after:DragonAPI")
 
 public class LegacyCraft extends DragonAPIMod {
 
@@ -84,6 +90,8 @@ public class LegacyCraft extends DragonAPIMod {
 	public static final LegacyConfig config = new LegacyConfig(instance, LegacyOptions.optionList, null, 1);
 
 	public static ModLogger logger;
+
+	private static final Random rand = new Random();
 
 	@Override
 	@EventHandler
@@ -270,6 +278,17 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	public ModLogger getModLogger() {
 		return logger;
+	}
+
+	@SubscribeEvent //Fixes a TiC bug
+	@ModDependent(ModList.TINKERER)
+	public void necroticBones(LivingDropsEvent evt) {
+		if (evt.entityLiving.getClass() == EntityLegacySkeleton.class) {
+			if (((EntitySkeleton)evt.entityLiving).getSkeletonType() == 1) {
+				if (rand.nextInt(Math.max(1, 5-evt.lootingLevel)) == 0) //Same formula as TiC
+					ReikaItemHelper.dropItem(evt.entityLiving, TinkerBlockHandler.Materials.NECROTICBONE.getItem());
+			}
+		}
 	}
 
 	@SubscribeEvent()
