@@ -56,6 +56,7 @@ import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
 import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
+import Reika.DragonAPI.Interfaces.ModCrop;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
@@ -359,7 +360,7 @@ public class LegacyCraft extends DragonAPIMod {
 			else {
 				int meta = evt.world.getBlockMetadata(evt.x, evt.y, evt.z);
 				ReikaCropHelper crop = ReikaCropHelper.getCrop(b);
-				ModCropList mod = ModCropList.getModCrop(b, meta);
+				ModCrop mod = ModCropList.getModCrop(b, meta);
 				if (crop != null) {
 					int metato = crop.ripeMeta;
 					evt.world.setBlockMetadataWithNotify(evt.x, evt.y, evt.z, metato, 3);
