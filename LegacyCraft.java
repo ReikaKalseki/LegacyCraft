@@ -56,7 +56,7 @@ import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
 import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
-import Reika.DragonAPI.Interfaces.ModCrop;
+import Reika.DragonAPI.Interfaces.Registry.ModCrop;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.IO.ReikaColorAPI;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;

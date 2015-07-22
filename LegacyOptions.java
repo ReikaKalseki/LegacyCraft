@@ -9,11 +9,9 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import net.minecraftforge.common.config.Configuration;
-import Reika.DragonAPI.Exception.RegistrationException;
-import Reika.DragonAPI.Interfaces.ConfigList;
+import Reika.DragonAPI.Interfaces.Configuration.BooleanConfig;
 
-public enum LegacyOptions implements ConfigList {
+public enum LegacyOptions implements BooleanConfig {
 
 	NEWAI("New Mob AI", false), //1.2
 	BABYZOMBIES("Disable Baby Zombies", true), //1.6
@@ -57,8 +55,6 @@ public enum LegacyOptions implements ConfigList {
 
 	private String label;
 	private boolean defaultState;
-	private int defaultValue;
-	private float defaultFloat;
 	private Class type;
 
 	public static final LegacyOptions[] optionList = LegacyOptions.values();
@@ -69,60 +65,20 @@ public enum LegacyOptions implements ConfigList {
 		type = boolean.class;
 	}
 
-	private LegacyOptions(String l, int d) {
-		label = l;
-		defaultValue = d;
-		type = int.class;
-	}
-
 	public boolean isBoolean() {
 		return type == boolean.class;
-	}
-
-	public boolean isNumeric() {
-		return type == int.class;
-	}
-
-	public boolean isDecimal() {
-		return type == float.class;
-	}
-
-	public float setDecimal(Configuration config) {
-		if (!this.isDecimal())
-			throw new RegistrationException(LegacyCraft.instance, "Config Property \""+this.getLabel()+"\" is not decimal!");
-		return (float)config.get("Control Setup", this.getLabel(), defaultFloat).getDouble(defaultFloat);
-	}
-
-	public float getFloat() {
-		return (Float)LegacyCraft.config.getControl(this.ordinal());
 	}
 
 	public Class getPropertyType() {
 		return type;
 	}
 
-	public int setValue(Configuration config) {
-		if (!this.isNumeric())
-			throw new RegistrationException(LegacyCraft.instance, "Config Property \""+this.getLabel()+"\" is not numerical!");
-		return config.get("Control Setup", this.getLabel(), defaultValue).getInt();
-	}
-
 	public String getLabel() {
 		return label;
 	}
 
-	public boolean setState(Configuration config) {
-		if (!this.isBoolean())
-			throw new RegistrationException(LegacyCraft.instance, "Config Property \""+this.getLabel()+"\" is not boolean!");
-		return config.get("Control Setup", this.getLabel(), defaultState).getBoolean(defaultState);
-	}
-
 	public boolean getState() {
 		return (Boolean)LegacyCraft.config.getControl(this.ordinal());
-	}
-
-	public int getValue() {
-		return (Integer)LegacyCraft.config.getControl(this.ordinal());
 	}
 
 	public boolean isDummiedOut() {
@@ -132,16 +88,6 @@ public enum LegacyOptions implements ConfigList {
 	@Override
 	public boolean getDefaultState() {
 		return defaultState;
-	}
-
-	@Override
-	public int getDefaultValue() {
-		return defaultValue;
-	}
-
-	@Override
-	public float getDefaultFloat() {
-		return defaultFloat;
 	}
 
 	@Override
