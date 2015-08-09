@@ -49,6 +49,7 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 import Reika.DragonAPI.DragonAPICore;
+import Reika.DragonAPI.DragonOptions;
 import Reika.DragonAPI.ModList;
 import Reika.DragonAPI.ASM.DependentMethodStripper.ModDependent;
 import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
@@ -103,6 +104,8 @@ public class LegacyCraft extends DragonAPIMod {
 		config.initProps(evt);
 
 		logger = new ModLogger(instance, false);
+		if (DragonOptions.FILELOG.getState())
+			logger.setOutput("**_Loading_Log.log");
 		MinecraftForge.TERRAIN_GEN_BUS.register(this);
 
 		this.basicSetup(evt);
@@ -174,7 +177,7 @@ public class LegacyCraft extends DragonAPIMod {
 			Blocks.portal.setTickRandomly(false);
 		}
 
-		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance, Side.SERVER);
+		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance);
 		this.finishTiming();
 	}
 

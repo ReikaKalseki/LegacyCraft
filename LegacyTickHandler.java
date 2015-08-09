@@ -9,6 +9,7 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
@@ -97,8 +98,8 @@ public class LegacyTickHandler implements TickHandler {
 	}
 
 	@Override
-	public TickType getType() {
-		return TickType.WORLD;
+	public EnumSet<TickType> getType() {
+		return EnumSet.of(TickType.WORLD);
 	}
 
 	@Override
