@@ -51,7 +51,8 @@ public enum LegacyOptions implements BooleanConfig {
 	ANIMALSPAWN("Pre Adventure Update Animal Spawning", false), //b1.8
 	HELDENCHANT("Allow Mobs to Hold Enchanted Weapons", true),
 	NETHERICE("Enable Ice to Water in Nether", true),
-	LAVAHISS("Lava Movement Hiss", true);
+	LAVAHISS("Lava Movement Hiss", true),
+	HOSTILECREATIVE("Mobs Target Creative Players", true);
 
 	private String label;
 	private boolean defaultState;

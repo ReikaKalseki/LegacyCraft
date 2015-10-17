@@ -56,6 +56,7 @@ import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
 import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
 import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
+import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Interfaces.Registry.ModCrop;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
@@ -379,6 +380,15 @@ public class LegacyCraft extends DragonAPIMod {
 						mod.makeRipe(evt.world, evt.x, evt.y, evt.z);
 					}
 				}
+			}
+		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void makeMobsCreativeHostile(MobTargetingEvent.Pre evt) {
+		if (LegacyOptions.HOSTILECREATIVE.getState()) {
+			if (!evt.defaultResult && evt.getResult() != Result.DENY) {
+				evt.setResult(Result.ALLOW);
 			}
 		}
 	}
