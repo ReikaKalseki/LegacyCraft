@@ -18,8 +18,8 @@ public class LegacyConfig extends ControlledConfig {
 
 	private DataElement<Boolean>[] overrides = new DataElement[MobOverrides.mobList.length];
 
-	public LegacyConfig(DragonAPIMod mod, ConfigList[] option, IDRegistry[] id, int cfg) {
-		super(mod, option, id, cfg);
+	public LegacyConfig(DragonAPIMod mod, ConfigList[] option, IDRegistry[] id) {
+		super(mod, option, id);
 
 		for (int i = 0; i < MobOverrides.mobList.length; i++) {
 			MobOverrides mob = MobOverrides.mobList[i];

@@ -92,7 +92,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@Instance("LegacyCraft")
 	public static LegacyCraft instance = new LegacyCraft();
 
-	public static final LegacyConfig config = new LegacyConfig(instance, LegacyOptions.optionList, null, 1);
+	public static final LegacyConfig config = new LegacyConfig(instance, LegacyOptions.optionList, null);
 
 	public static ModLogger logger;
 
