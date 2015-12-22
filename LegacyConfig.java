@@ -16,22 +16,19 @@ import Reika.DragonAPI.Interfaces.Registry.IDRegistry;
 
 public class LegacyConfig extends ControlledConfig {
 
-	private boolean[] overrides = new boolean[MobOverrides.mobList.length];
+	private DataElement<Boolean>[] overrides = new DataElement[MobOverrides.mobList.length];
 
 	public LegacyConfig(DragonAPIMod mod, ConfigList[] option, IDRegistry[] id, int cfg) {
 		super(mod, option, id, cfg);
-	}
 
-	@Override
-	protected void loadAdditionalData() {
 		for (int i = 0; i < MobOverrides.mobList.length; i++) {
 			MobOverrides mob = MobOverrides.mobList[i];
-			overrides[i] = config.get("Mob Overrides", mob.name, true).getBoolean(true);
+			overrides[i] = this.registerAdditionalOption("Mob Overrides", mob.name, true);
 		}
 	}
 
 	public boolean overrideMob(MobOverrides mob) {
-		return overrides[mob.ordinal()];
+		return overrides[mob.ordinal()].getData();
 	}
 
 }

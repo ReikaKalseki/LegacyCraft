@@ -52,7 +52,8 @@ public enum LegacyOptions implements BooleanConfig {
 	HELDENCHANT("Allow Mobs to Hold Enchanted Weapons", true),
 	NETHERICE("Enable Ice to Water in Nether", true),
 	LAVAHISS("Lava Movement Hiss", true),
-	HOSTILECREATIVE("Mobs Target Creative Players", true);
+	HOSTILECREATIVE("Mobs Target Creative Players", true),
+	NOHORSES("Disable Horses", false); //1.7
 
 	private String label;
 	private boolean defaultState;

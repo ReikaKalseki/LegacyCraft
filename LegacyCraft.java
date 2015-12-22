@@ -26,6 +26,7 @@ import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
+import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -41,6 +42,7 @@ import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
@@ -321,6 +323,16 @@ public class LegacyCraft extends DragonAPIMod {
 				ez.setChild(false);
 			}
 		}
+		if (e instanceof EntityHorse) {
+			ev.setResult(LegacyOptions.NOHORSES.getState() ? Result.DENY : ev.getResult());
+		}
+	}
+
+	public void clearControlMobs(EntityJoinWorldEvent evt) {
+		Entity e = evt.entity;
+		if (e instanceof EntityHorse) {
+			evt.setCanceled(LegacyOptions.NOHORSES.getState() ? true : evt.isCanceled());
+		}
 	}
 
 	@SubscribeEvent()
@@ -380,6 +392,7 @@ public class LegacyCraft extends DragonAPIMod {
 						mod.makeRipe(evt.world, evt.x, evt.y, evt.z);
 					}
 				}
+				evt.entityPlayer.getCurrentEquippedItem().stackSize--;
 			}
 		}
 	}
