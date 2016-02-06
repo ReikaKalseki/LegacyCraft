@@ -22,7 +22,6 @@ public class WorldGenCustomNetherLava extends WorldGenerator
 {
 	private Block genBlock;
 	private boolean forceUpdate;
-	private static final String __OBFID = "CL_00000414";
 
 	public WorldGenCustomNetherLava(Block gen, boolean upd)
 	{

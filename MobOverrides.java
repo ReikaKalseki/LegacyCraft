@@ -21,8 +21,8 @@ import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 public enum MobOverrides {
 
 	CREEPER(EntityLegacyCreeper.class, "Creeper", 50),
-	ZOMBIE(EntityLegacySkeleton.class, "Skeleton", 51),
-	SKELETON(EntityLegacyZombie.class, "Zombie", 54),
+	SKELETON(EntityLegacySkeleton.class, "Skeleton", 51),
+	ZOMBIE(EntityLegacyZombie.class, "Zombie", 54),
 	SPIDER(EntityLegacySpider.class, "Spider", 52),
 	ENDERMAN(EntityLegacyEnderman.class, "Enderman", 58),
 	VILLAGER(EntityLegacyVillager.class, "Villager", 120);
@@ -39,6 +39,7 @@ public enum MobOverrides {
 		entityID = id;
 	}
 
+	@Deprecated
 	public void register() {
 		ReikaEntityHelper.overrideEntity(mobClass, name, entityID);
 	}
@@ -46,10 +47,14 @@ public enum MobOverrides {
 	public static void registerAll() {
 		for (int i = 0; i < mobList.length; i++) {
 			MobOverrides mob = mobList[i];
-			if (LegacyCraft.config.overrideMob(mob)) {
+			if (mob.isActive()) {
 				mob.register();
 			}
 		}
+	}
+
+	public boolean isActive() {
+		return LegacyCraft.config.overrideMob(this);
 	}
 
 }

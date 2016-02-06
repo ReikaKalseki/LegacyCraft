@@ -11,30 +11,35 @@ package Reika.LegacyCraft;
 
 import java.net.URL;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -55,10 +60,12 @@ import Reika.DragonAPI.DragonOptions;
 import Reika.DragonAPI.ModList;
 import Reika.DragonAPI.ASM.DependentMethodStripper.ModDependent;
 import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
-import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry;
+import Reika.DragonAPI.Auxiliary.Trackers.PlayerHandler;
 import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
+import Reika.DragonAPI.Instantiable.Event.AddRecipeEvent;
 import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
+import Reika.DragonAPI.Instantiable.Event.Client.LightmapEvent;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
 import Reika.DragonAPI.Interfaces.Registry.ModCrop;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
@@ -71,7 +78,11 @@ import Reika.DragonAPI.ModInteract.ItemHandlers.TinkerBlockHandler;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -111,6 +122,35 @@ public class LegacyCraft extends DragonAPIMod {
 			logger.setOutput("**_Loading_Log.log");
 		MinecraftForge.TERRAIN_GEN_BUS.register(this);
 
+
+		if (LegacyOptions.NETHERICE.getState()) {
+			/*
+			BlockLiquid b1 = (BlockLiquid)(new BlockLegacyDynamicLiquid(Material.water).disableStats().setHardness(100.0F).setLightOpacity(3).setBlockName("water").setBlockTextureName("water_flow"));
+			BlockLiquid b2 = (BlockLiquid)(new BlockLegacyStaticLiquid(Material.water).disableStats().setHardness(100.0F).setLightOpacity(3).setBlockName("water").setBlockTextureName("water_still"));
+
+			Block.blockRegistry.addObject(8, "flowing_water", b1);
+			Block.blockRegistry.addObject(9, "water", b2);
+
+			//Blocks.water = b2;
+			//Blocks.flowing_water = b1;
+			try {
+				String f1 = FMLForgePlugin.RUNTIME_DEOBF ? "field_150355_j" : "water";
+				String f2 = FMLForgePlugin.RUNTIME_DEOBF ? "field_150358_i" : "flowing_water";
+				ReikaReflectionHelper.setFinalField(Blocks.class, f1, null, b2);
+				ReikaReflectionHelper.setFinalField(Blocks.class, f2, null, b1);
+				logger.log("Patched water block fields to ensure functionality of Nether Ice behavior");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				throw new RegistrationException(this, "Could not patch water block fields!");
+			}
+			 */
+			if (Blocks.water.getClass() != BlockStaticLiquid.class || Blocks.flowing_water.getClass() != BlockDynamicLiquid.class) {
+				logger.logError("Water block overridden with "+Blocks.water.getClass()+", "+Blocks.flowing_water.getClass()+", Ice in Nether behavior may not function. This is a serious mistake in "+ReikaItemHelper.getRegistrantMod(new ItemStack(Blocks.water)));
+			}
+		}
+
+
 		this.basicSetup(evt);
 		this.finishTiming();
 	}
@@ -122,51 +162,35 @@ public class LegacyCraft extends DragonAPIMod {
 		//Overrides vanilla
 		MobOverrides.registerAll();
 
+		PlayerHandler.instance.registerTracker(new LegacyPlayerTracker());
+
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();
 			LegacyPotionRegen regen = new LegacyPotionRegen();
-		}
-
-		if (LegacyOptions.GOLDENAPPLE.getState()) {
-			List<ShapedRecipes> li = ReikaRecipeHelper.getShapedRecipesByOutput(new ItemStack(Items.golden_apple, 1, 0));
-			for (int i = 0; i < li.size(); i++) {
-				ShapedRecipes ir = li.get(i);
-				for (int j = 0; j < ir.recipeItems.length; j++) {
-					ItemStack is = ir.recipeItems[j];
-					if (is != null && is.getItem() == Items.gold_ingot) {
-						ir.recipeItems[j] = new ItemStack(Items.gold_nugget);
-					}
-				}
-			}
-		}
-
-		if (LegacyOptions.OLDBOOK.getState()) {
-			List<ShapedRecipes> li = ReikaRecipeHelper.getShapedRecipesByOutput(new ItemStack(Items.book, 1, 0));
-			for (int i = 0; i < li.size(); i++) {
-				ShapedRecipes ir = li.get(i);
-				CraftingManager.getInstance().getRecipeList().remove(ir);
-			}
-			GameRegistry.addRecipe(new ItemStack(Items.book), "P", "P", "P", 'P', Items.paper);
-		}
-
-		if (LegacyOptions.OLDBOOK.getState()) {
-			List<ShapedRecipes> li = ReikaRecipeHelper.getShapedRecipesByOutput(new ItemStack(Items.speckled_melon, 1, 0));
-			for (int i = 0; i < li.size(); i++) {
-				ShapedRecipes ir = li.get(i);
-				CraftingManager.getInstance().getRecipeList().remove(ir);
-			}
-			GameRegistry.addShapelessRecipe(new ItemStack(Items.speckled_melon), Items.melon, Items.gold_nugget);
 		}
 
 		if (LegacyOptions.SILVERFISH.getState()) {
 			if (BiomeGenBase.extremeHills instanceof BiomeGenHills) { //Because BoP
 				BiomeGenHills ex = (BiomeGenHills)BiomeGenBase.extremeHills;
 				BiomeGenHills ex2 = (BiomeGenHills)BiomeGenBase.extremeHillsEdge;
-				Class c = BiomeGenHills.class;
+				BiomeGenHills ex3 = (BiomeGenHills)BiomeGenBase.biomeList[BiomeGenBase.extremeHills.biomeID+128];
+				BiomeGenHills ex4 = (BiomeGenHills)BiomeGenBase.extremeHillsPlus;
+				BiomeGenHills ex5 = (BiomeGenHills)BiomeGenBase.biomeList[BiomeGenBase.extremeHillsPlus.biomeID+128];
 				WorldGenMinable dummy = new WorldGenMinable(Blocks.stone, 0);
 				ex.theWorldGenerator = dummy;
 				ex2.theWorldGenerator = dummy;
+				ex3.theWorldGenerator = dummy;
+				ex4.theWorldGenerator = dummy;
+				ex5.theWorldGenerator = dummy;
 			}
+		}
+
+		if (LegacyOptions.OLDBOOK.getState()) {
+			GameRegistry.addRecipe(new ItemStack(Items.book), "P", "P", "P", 'P', Items.paper);
+		}
+
+		if (LegacyOptions.OLDMELON.getState()) {
+			GameRegistry.addShapelessRecipe(new ItemStack(Items.speckled_melon), Items.melon, Items.gold_nugget);
 		}
 
 		if (LegacyOptions.ROSES.getState()) {
@@ -180,8 +204,48 @@ public class LegacyCraft extends DragonAPIMod {
 			Blocks.portal.setTickRandomly(false);
 		}
 
-		TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance);
+		//TickRegistry.instance.registerTickHandler(LegacyTickHandler.instance);
 		this.finishTiming();
+	}
+
+	@SubscribeEvent
+	public void onAddRecipe(AddRecipeEvent evt) {
+		IRecipe ir = evt.recipe;
+		ItemStack out = ir.getRecipeOutput();
+
+		if (out != null) {
+			if (LegacyOptions.GOLDENAPPLE.getState()) {
+				if (ReikaItemHelper.matchStacks(new ItemStack(Items.golden_apple, 1, 0), out)) {
+					ReikaRecipeHelper.replaceIngredientInRecipe(new ItemStack(Items.gold_ingot), new ItemStack(Items.gold_nugget), ir);
+				}
+			}
+
+			if (LegacyOptions.OLDBOOK.getState()) {
+				if (out.getItem() == Items.book && evt.isVanillaPass) {
+					evt.setCanceled(true);
+				}
+			}
+
+			if (LegacyOptions.OLDMELON.getState()) {
+				if (ir instanceof ShapedRecipes && out.getItem() == Items.speckled_melon && evt.isVanillaPass) {
+					evt.setCanceled(true);
+				}
+			}
+
+			if (LegacyOptions.ROSES.getState()) {
+				if (ir instanceof ShapelessRecipes) {
+					ShapelessRecipes sr = (ShapelessRecipes)ir;
+					if (ReikaItemHelper.matchStacks(out, ReikaItemHelper.redDye)) {
+						if (sr.recipeItems.size() == 1) {
+							Object o = sr.recipeItems.get(0);
+							if (o instanceof ItemStack && ((ItemStack)o).getItem() == Item.getItemFromBlock(Blocks.red_flower)) {
+								sr.getRecipeOutput().stackSize = Math.max(2, sr.getRecipeOutput().stackSize);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@SubscribeEvent
@@ -287,6 +351,33 @@ public class LegacyCraft extends DragonAPIMod {
 		return logger;
 	}
 
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void enforceMobs(EntityJoinWorldEvent evt) {
+		if (LegacyOptions.FORCEMOBS.getState() && !evt.world.isRemote) {
+			Entity e = evt.entity;
+			if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
+				evt.world.spawnEntityInWorld(new EntityLegacyZombie((EntityZombie)e));
+				evt.setCanceled(true);
+			}
+			else if (e.getClass() == EntitySkeleton.class && MobOverrides.SKELETON.isActive()) {
+				evt.world.spawnEntityInWorld(new EntityLegacySkeleton((EntitySkeleton)e));
+				evt.setCanceled(true);
+			}
+			else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
+				evt.world.spawnEntityInWorld(new EntityLegacyCreeper((EntityCreeper)e));
+				evt.setCanceled(true);
+			}
+			else if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
+				evt.world.spawnEntityInWorld(new EntityLegacyEnderman((EntityEnderman)e));
+				evt.setCanceled(true);
+			}
+			else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
+				evt.world.spawnEntityInWorld(new EntityLegacyVillager((EntityVillager)e));
+				evt.setCanceled(true);
+			}
+		}
+	}
+
 	@SubscribeEvent //Fixes a TiC bug
 	@ModDependent(ModList.TINKERER)
 	public void necroticBones(LivingDropsEvent evt) {
@@ -365,6 +456,7 @@ public class LegacyCraft extends DragonAPIMod {
 	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 	public void bonemeal(BonemealEvent evt) {
 		if (LegacyOptions.BONEMEAL.getState() && !evt.world.isRemote) {
+			boolean flag = false;
 			Block b = evt.block;
 			if (b == Blocks.sapling) {
 				BlockSapling sap = (BlockSapling)Blocks.sapling;
@@ -372,6 +464,7 @@ public class LegacyCraft extends DragonAPIMod {
 				evt.world.setBlockMetadataWithNotify(evt.x, evt.y, evt.z, meta, 3);
 				sap.func_149879_c(evt.world, evt.x, evt.y, evt.z, new Random());
 				evt.setResult(Result.ALLOW);
+				return;
 			}
 			else {
 				int meta = evt.world.getBlockMetadata(evt.x, evt.y, evt.z);
@@ -380,6 +473,7 @@ public class LegacyCraft extends DragonAPIMod {
 				if (crop != null) {
 					int metato = crop.ripeMeta;
 					evt.world.setBlockMetadataWithNotify(evt.x, evt.y, evt.z, metato, 3);
+					flag = true;
 				}
 				else if (mod != null) {
 					if (mod == ModCropList.MAGIC) {
@@ -390,9 +484,19 @@ public class LegacyCraft extends DragonAPIMod {
 					}
 					else {
 						mod.makeRipe(evt.world, evt.x, evt.y, evt.z);
+						flag = true;
 					}
 				}
-				evt.entityPlayer.getCurrentEquippedItem().stackSize--;
+			}
+			if (flag) {
+				if (evt.entityPlayer != null) {
+					ItemStack is = evt.entityPlayer.getCurrentEquippedItem();
+					if (is != null) {
+						is.stackSize--;
+						if (is.stackSize <= 0)
+							evt.entityPlayer.setCurrentItemOrArmor(0, null);
+					}
+				}
 			}
 		}
 	}
@@ -407,7 +511,8 @@ public class LegacyCraft extends DragonAPIMod {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static void adjustLightMap() {
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void adjustLightMap(LightmapEvent evt) {
 		if (LegacyOptions.OLDLIGHT.getState()) {
 			int[] colors = Minecraft.getMinecraft().entityRenderer.lightmapColors;
 			for (int i = 0; i < colors.length; i++) {

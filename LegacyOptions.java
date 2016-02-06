@@ -9,6 +9,9 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import java.io.File;
+
+import net.minecraftforge.common.config.Configuration;
 import Reika.DragonAPI.Interfaces.Configuration.BooleanConfig;
 
 public enum LegacyOptions implements BooleanConfig {
@@ -53,7 +56,8 @@ public enum LegacyOptions implements BooleanConfig {
 	NETHERICE("Enable Ice to Water in Nether", true),
 	LAVAHISS("Lava Movement Hiss", true),
 	HOSTILECREATIVE("Mobs Target Creative Players", true),
-	NOHORSES("Disable Horses", false); //1.7
+	NOHORSES("Disable Horses", false), //1.7
+	PORTALSOUNDS("Old Nether Portal Sounds", true); //Broken in 1.3, probably a bug
 
 	private String label;
 	private boolean defaultState;
@@ -81,6 +85,10 @@ public enum LegacyOptions implements BooleanConfig {
 
 	public boolean getState() {
 		return (Boolean)LegacyCraft.config.getControl(this.ordinal());
+	}
+
+	public boolean getEarlyLoadState() {
+		return new Configuration(new File("/config/Reika/LegacyCraft/config.cfg")).get(this.getLabel(), "control setup", defaultState).getBoolean();
 	}
 
 	public boolean isDummiedOut() {

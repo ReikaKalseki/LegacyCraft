@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import cpw.mods.fml.relauncher.Side;
 
-@SortingIndex(1001)
+@SortingIndex(Integer.MAX_VALUE-1)
 @MCVersion("1.7.10")
 public class LegacyASMHandler implements IFMLLoadingPlugin {
 
@@ -88,12 +88,12 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SUGARCANE("net.minecraft.block.BlockReed", "ane"),
 			NETHERLAVA("net.minecraft.world.gen.ChunkProviderHell", "aqv"),
 			ENDERPORT("net.minecraft.entity.monster.EntityEnderman", "ya"),
-			LIGHTMAP("net.minecraft.client.renderer.EntityRenderer", "blt"),
 			FOLIAGE("net.minecraft.world.ColorizerFoliage", "agx"),
 			ANIMALSPAWN("net.minecraft.world.WorldServer", "mt"),
 			PORTAL1("net.minecraft.block.BlockPortal", "amp"),
 			PORTAL2("net.minecraft.block.BlockEndPortal", "akt"),
 			ICEBLOCK("net.minecraft.block.BlockIce", "alp"),
+			WATERPATCH("net.minecraft.block.Block", "aji"),
 			LAVAHISS("net.minecraft.block.BlockLiquid", "alw"),
 			;
 
@@ -201,24 +201,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 								ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 								break;
 							}
-						}
-						break;
-					}
-					case LIGHTMAP: {
-						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_78472_g", "updateLightmap", "(F)V");
-						AbstractInsnNode loc = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain.getOpcode() == Opcodes.IASTORE) {
-								loc = ain;
-							}
-						}
-						if (loc != null) {
-							m.instructions.insert(loc, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "adjustLightMap", "()V", false));
-							ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
-						}
-						else {
-							ReikaASMHelper.log("Could not apply "+this+" ASM handler; reference IASTORE not found!");
 						}
 						break;
 					}
@@ -371,6 +353,30 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 								}
 							}
 						}
+						break;
+					}
+					case WATERPATCH: {
+						if (!getConfig("Enable Ice to Water in Nether", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149671_p", "registerBlocks", "()V");
+
+						AbstractInsnNode loc = ReikaASMHelper.getFirstInsnAfter(m.instructions, 0, Opcodes.BIPUSH, 8);
+						loc = ReikaASMHelper.getFirstOpcodeAfter(m.instructions, m.instructions.indexOf(loc), Opcodes.NEW);
+						TypeInsnNode type = (TypeInsnNode)loc;
+						int idx = m.instructions.indexOf(type);
+						type.desc = "net/minecraft/block/BlockDynamicLiquid";
+						MethodInsnNode min = (MethodInsnNode)ReikaASMHelper.getFirstOpcodeAfter(m.instructions, idx, Opcodes.INVOKESPECIAL);
+						min.owner = type.desc;
+
+						type = (TypeInsnNode)ReikaASMHelper.getFirstOpcodeAfter(m.instructions, idx+1, Opcodes.NEW);
+						idx = m.instructions.indexOf(type);
+						type.desc = "net/minecraft/block/BlockStaticLiquid";
+						min = (MethodInsnNode)ReikaASMHelper.getFirstOpcodeAfter(m.instructions, idx, Opcodes.INVOKESPECIAL);
+						min.owner = type.desc;
+
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
 					case LAVAHISS: {
