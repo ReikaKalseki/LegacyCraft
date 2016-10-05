@@ -51,7 +51,7 @@ public class EntityLegacyVillager extends EntityVillager {
 	@Override
 	public boolean isAIEnabled()
 	{
-		return LegacyOptions.NEWAI.getState();
+		return true;//LegacyOptions.NEWAI.getState();
 	}
 
 	@Override
