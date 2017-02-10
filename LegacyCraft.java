@@ -9,6 +9,7 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Random;
@@ -349,6 +350,11 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	public ModLogger getModLogger() {
 		return logger;
+	}
+
+	@Override
+	public File getConfigFolder() {
+		return config.getConfigFolder();
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
