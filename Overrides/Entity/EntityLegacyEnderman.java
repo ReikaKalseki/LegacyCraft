@@ -12,6 +12,7 @@ package Reika.LegacyCraft.Overrides.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
+
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyEnderman extends EntityEnderman {

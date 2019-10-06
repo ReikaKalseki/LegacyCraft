@@ -12,8 +12,10 @@ package Reika.LegacyCraft;
 import java.util.EnumSet;
 
 import net.minecraft.world.World;
+
 import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry.TickHandler;
 import Reika.DragonAPI.Auxiliary.Trackers.TickRegistry.TickType;
+
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
 public class LegacyTickHandler implements TickHandler {

@@ -10,6 +10,7 @@
 package Reika.LegacyCraft;
 
 import net.minecraft.entity.player.EntityPlayer;
+
 import Reika.DragonAPI.Auxiliary.Trackers.PlayerHandler.PlayerTracker;
 import Reika.DragonAPI.Libraries.IO.ReikaSoundHelper;
 

@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -16,10 +16,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+
+import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
+
+import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class EntityLegacyCreeper extends EntityCreeper {
 
@@ -68,19 +72,24 @@ public class EntityLegacyCreeper extends EntityCreeper {
 	@Override
 	public void onUpdate() {
 
-		AxisAlignedBB box = AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX, posY+this.getEyeHeight(), posZ).expand(2, 2, 2);
-		List<EntityPlayer> li = worldObj.getEntitiesWithinAABB(EntityPlayer.class, box);
-		boolean flag = false;
-		for (EntityPlayer ep : li) {
-			if (!ep.isDead && ep.getHealth() > 0 && !ep.capabilities.isCreativeMode)
-				flag = true;
+		if (!worldObj.isRemote) {
+			AxisAlignedBB box = AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX, posY+this.getEyeHeight(), posZ).expand(2, 2, 2);
+			List<EntityPlayer> li = worldObj.getEntitiesWithinAABB(EntityPlayer.class, box);
+			boolean flag = false;
+			for (EntityPlayer ep : li) {
+				if (!ep.isDead && ep.getHealth() > 0 && !ep.capabilities.isCreativeMode) {
+					Result res = MobTargetingEvent.firePre(ep, worldObj, posX, posY, posZ, 2);
+					if (res != Result.DENY)
+						flag = true;
+				}
+			}
+			if (flag) {
+				this.setCreeperState(1);
+				motionX = motionZ = 0;
+			}
+			else
+				this.setCreeperState(-1);
 		}
-		if (flag) {
-			this.setCreeperState(1);
-			motionX = motionZ = 0;
-		}
-		else
-			this.setCreeperState(-1);
 
 		super.onUpdate();
 

@@ -14,11 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.classloading.FMLForgePlugin;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -37,7 +32,13 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.classloading.FMLForgePlugin;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
+
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;

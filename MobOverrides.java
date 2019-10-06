@@ -10,6 +10,7 @@
 package Reika.LegacyCraft;
 
 import net.minecraft.entity.EntityLiving;
+
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;

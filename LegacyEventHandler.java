@@ -40,6 +40,7 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
+
 import Reika.DragonAPI.ModList;
 import Reika.DragonAPI.ASM.DependentMethodStripper.ModDependent;
 import Reika.DragonAPI.Instantiable.Event.AddRecipeEvent;
@@ -58,6 +59,7 @@ import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
+
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

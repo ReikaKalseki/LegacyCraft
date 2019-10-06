@@ -35,6 +35,7 @@ import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+
 import Reika.DragonAPI.DragonAPICore;
 import Reika.DragonAPI.DragonOptions;
 import Reika.DragonAPI.Auxiliary.Trackers.CommandableUpdateChecker;
@@ -46,6 +47,7 @@ import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;

@@ -16,6 +16,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+
 import Reika.DragonAPI.Libraries.World.ReikaWorldHelper;
 
 public class WorldGenCustomNetherLava extends WorldGenerator

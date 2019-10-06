@@ -12,6 +12,7 @@ package Reika.LegacyCraft;
 import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
+
 import Reika.DragonAPI.Interfaces.Configuration.BooleanConfig;
 
 public enum LegacyOptions implements BooleanConfig {

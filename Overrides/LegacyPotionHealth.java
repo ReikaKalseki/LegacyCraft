@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionHealth;
 import net.minecraft.util.DamageSource;
+
 import Reika.LegacyCraft.LegacyOptions;
 
 public class LegacyPotionHealth extends PotionHealth {

@@ -16,6 +16,7 @@ import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.world.World;
+
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyVillager extends EntityVillager {
