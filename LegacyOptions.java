@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -58,7 +58,9 @@ public enum LegacyOptions implements BooleanConfig {
 	LAVAHISS("Lava Movement Hiss", true),
 	HOSTILECREATIVE("Mobs Target Creative Players", true),
 	NOHORSES("Disable Horses", false), //1.7
-	PORTALSOUNDS("Old Nether Portal Sounds", true); //Broken in 1.3, probably a bug
+	PORTALSOUNDS("Old Nether Portal Sounds", true), //Broken in 1.3, probably a bug
+	FLINTSOUND("Old Flint And Steel Sound", true), //1.4.2
+	;
 
 	private String label;
 	private boolean defaultState;

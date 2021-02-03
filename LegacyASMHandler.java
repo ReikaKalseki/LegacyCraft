@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -96,6 +96,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			ICEBLOCK("net.minecraft.block.BlockIce", "alp"),
 			WATERPATCH("net.minecraft.block.Block", "aji"),
 			LAVAHISS("net.minecraft.block.BlockLiquid", "alw"),
+			FLINTSOUND("net.minecraft.item.ItemFlintAndSteel", "acw"),
 			;
 
 			private final String obfName;
@@ -388,6 +389,20 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149799_m", "func_149799_m", "(Lnet/minecraft/world/World;III)V");
 						m.instructions.clear();
 						m.instructions.add(new InsnNode(Opcodes.RETURN));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case FLINTSOUND: {
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_77648_a", "onItemUse", "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;IIIIFFF)Z");
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.LDC) {
+								LdcInsnNode ldc = (LdcInsnNode)ain;
+								if ("fire.ignite".equals(ldc.cst)) {
+									ReikaASMHelper.replaceInstruction(m.instructions, ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "getFlintAndSteelSound", "()Ljava/lang/String;", false));
+								}
+							}
+						}
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}

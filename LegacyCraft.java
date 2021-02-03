@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -20,6 +20,7 @@ import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.init.Blocks;
@@ -43,11 +44,14 @@ import Reika.DragonAPI.Auxiliary.Trackers.PlayerHandler;
 import Reika.DragonAPI.Base.DragonAPIMod;
 import Reika.DragonAPI.Base.DragonAPIMod.LoadProfiler.LoadPhase;
 import Reika.DragonAPI.Instantiable.IO.ModLogger;
+import Reika.DragonAPI.Instantiable.IO.SingleSound;
+import Reika.DragonAPI.Instantiable.IO.SoundLoader;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -71,6 +75,9 @@ public class LegacyCraft extends DragonAPIMod {
 	public static ModLogger logger;
 
 	static final Random rand = new Random();
+
+	private static SingleSound flintAndSteel;
+	private static SoundLoader sounds;
 
 	@Override
 	@EventHandler
@@ -127,6 +134,13 @@ public class LegacyCraft extends DragonAPIMod {
 		MobOverrides.registerAll();
 
 		PlayerHandler.instance.registerTracker(new LegacyPlayerTracker());
+
+		flintAndSteel = new SingleSound("flintsteel", "Reika/LegacyCraft/flintsteel.ogg");
+		sounds = new SoundLoader(flintAndSteel);
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			flintAndSteel.setSoundCategory(SoundCategory.BLOCKS);
+			sounds.register();
+		}
 
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();
@@ -293,6 +307,10 @@ public class LegacyCraft extends DragonAPIMod {
 
 	public static float getNonAIMoveSpeed() {
 		return 0.2F;
+	}
+
+	public static String getFlintAndSteelSound() {
+		return LegacyOptions.FLINTSOUND.getState() ? sounds.getResource(flintAndSteel).toString() : "fire.ignite";
 	}
 
 }
