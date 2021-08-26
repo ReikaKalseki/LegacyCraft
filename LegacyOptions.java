@@ -17,12 +17,13 @@ public enum LegacyOptions implements BooleanConfig {
 	BABYZOMBIES("Disable Baby Zombies", true), //1.6
 	OLDRANGE("Old Zombie Sight Range", true), //1.6
 	OLDZOMBIES("Old Zombie HP/Damage", true), //1.6
+	ZOMBIESUMMONS("Disable Zombie Summons", true), //1.6
 	BONEMEAL("Old Bonemeal Mechanics", true), //1.5
 	ZOMBIEVILLAGER("Zombies Target Villagers", false), //1.2
 	BACKUP("Disable Zombie Reinforcements", true), //1.6
 	ZOMBIEDOOR("Zombies Break Doors", false), //1.2
-	* ZOMBIETOOLS("Zombies Can Spawn With Tools", false), //1.4
-	* MOBARMOR("Mobs Can Spawn With Armor", false), //1.4
+	ZOMBIETOOLS("Zombies Can Spawn With Tools", false), //1.4
+	MOBARMOR("Mobs Can Spawn With Armor", false), //1.4
 	ZOMBIEFIRE("Zombies Attack with Fire", false), //1.4
 	FIREARROWS("Allow Skeleton Flaming Arrows", false), //1.4
 	ARROWSPEED("Old Skeleton Fire Rate", true), //1.4

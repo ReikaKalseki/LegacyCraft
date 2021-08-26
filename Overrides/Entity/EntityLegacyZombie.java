@@ -52,34 +52,10 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (LegacyOptions.ZOMBIEVILLAGER.getState())
 			targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityVillager.class, 0, false));
 
-		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
-			this.setVillager(false);
-		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
-			//this.setChild(false);
-			this.setDead();
-
 	}
 
 	public EntityLegacyZombie(EntityZombie e) {
 		this(e.worldObj);
-	}
-
-	@Override
-	protected void applyEntityAttributes()
-	{
-		super.applyEntityAttributes();
-		if (LegacyOptions.OLDRANGE.getState()) {
-			this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(16.0D);
-		}
-
-		if (LegacyOptions.BABYZOMBIES.getState())
-			this.getAttributeMap().registerAttribute(field_110186_bp).setBaseValue(0.0D);
-
-		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
-			this.setVillager(false);
-		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState())
-			//this.setChild(false);
-			this.setDead();
 	}
 
 	@Override

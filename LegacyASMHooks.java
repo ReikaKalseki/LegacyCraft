@@ -1,5 +1,7 @@
 package Reika.LegacyCraft;
 
+import java.util.Collection;
+
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
@@ -39,7 +41,7 @@ public class LegacyASMHooks {
 	}
 
 	public static EntityZombie.GroupData interceptZombieData(EntityZombie.GroupData data, EntityZombie e) {
-		if (!LegacyOptions.BABYZOMBIES.getState())
+		if (LegacyOptions.BABYZOMBIES.getState())
 			data.field_142048_a = false;
 		if (!LegacyOptions.ZOMBIEVILLAGER.getState())
 			data.field_142046_b = false;
@@ -61,7 +63,7 @@ public class LegacyASMHooks {
 			}
 			if (!LegacyOptions.ZOMBIEVILLAGER.getState())
 				ez.setVillager(false);
-			if (!LegacyOptions.BABYZOMBIES.getState())
+			if (LegacyOptions.BABYZOMBIES.getState())
 				ez.setChild(false);
 			if (ez.ridingEntity != null)
 				ez.mountEntity(null);
@@ -75,10 +77,22 @@ public class LegacyASMHooks {
 		return el;
 	}
 
+	public static void applyEntityAttributes(EntityLiving e) {
+		if (e instanceof EntityZombie) {
+			if (LegacyOptions.OLDRANGE.getState())
+				e.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(16.0D);
+			if (LegacyOptions.ZOMBIESUMMONS.getState())
+				e.getEntityAttribute(EntityZombie.field_110186_bp).setBaseValue(0.0D);
+		}
+	}
+
 	private static void removeModifierByName(EntityLiving e, IAttribute ia, String n) {
 		IAttributeInstance iai = e.getEntityAttribute(ia);
-		AttributeModifier mod = ReikaEntityHelper.getAttributeByName(iai, n);
-		iai.removeModifier(mod);
+		Collection<AttributeModifier> c = ReikaEntityHelper.getAttributeByName(iai, n);
+		if (c != null) {
+			for (AttributeModifier mod : c)
+				iai.removeModifier(mod);
+		}
 	}
 
 }

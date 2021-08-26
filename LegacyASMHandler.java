@@ -110,6 +110,16 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SPIDERENCHANT("net.minecraft.entity.monster.EntitySpider", "yn"),
 			EQUIPDMG("net.minecraft.entity.EntityLiving", "sw"),
 			ZOMBIEHOOKS("net.minecraft.entity.monster.EntityZombie", "yq"),
+			CREEPERSPAWN("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			SKELLYSPAWN("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			ZOMBIESPAWN("net.minecraft.entity.monster.EntityZombie", "yq"),
+			SPIDERSPAWN("net.minecraft.entity.monster.EntitySpider", "yn"),
+			CREEPERATTR("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			SKELLYATTR("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			ZOMBIEATTR("net.minecraft.entity.monster.EntityZombie", "yq"),
+			SPIDERATTR("net.minecraft.entity.monster.EntitySpider", "yn"),
+			ZOMBIETOOLS("net.minecraft.entity.monster.EntityZombie", "yq"),
+			MOBARMOR("net.minecraft.entity.monster.EntityMob", "yg"),
 			;
 
 			private final String obfName;
@@ -238,6 +248,25 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					for (int i = m.instructions.size()-1; i >= 0; i--) {
 						AbstractInsnNode ain = m.instructions.get(i);
 						if (ain.getOpcode() == Opcodes.ARETURN) {
+							m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(li));
+						}
+					}
+				}
+			}
+
+			private static void patchEntityAttr(ClassNode cn) {
+				MethodNode m = getOrCreateMethod(cn, "func_110147_ax", "applyEntityAttributes", "()V", false);
+				InsnList li = new InsnList();
+				li.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				li.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "applyEntityAttributes", "(Lnet/minecraft/entity/EntityLiving;)V", false));
+				if (m.instructions.size() == 0) {
+					m.instructions.add(li);
+					m.instructions.add(new InsnNode(Opcodes.RETURN));
+				}
+				else {
+					for (int i = m.instructions.size()-1; i >= 0; i--) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.RETURN) {
 							m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(li));
 						}
 					}
@@ -576,6 +605,42 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						VarInsnNode vin = (VarInsnNode)ReikaASMHelper.getLastInsnBefore(m.instructions, m.instructions.indexOf(fin), Opcodes.ASTORE, var);
 						m.instructions.insertBefore(vin, new VarInsnNode(Opcodes.ALOAD, 0));
 						m.instructions.insertBefore(vin, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "interceptZombieData", "(Lnet/minecraft/entity/monster/EntityZombie$GroupData;Lnet/minecraft/entity/monster/EntityZombie;)Lnet/minecraft/entity/monster/EntityZombie$GroupData;", false));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case CREEPERSPAWN:
+					case SKELLYSPAWN:
+					case ZOMBIESPAWN:
+					case SPIDERSPAWN: {
+						this.addEggSpawnHook(cn);
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case CREEPERATTR:
+					case SKELLYATTR:
+					case ZOMBIEATTR:
+					case SPIDERATTR: {
+						this.patchEntityAttr(cn);
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case ZOMBIETOOLS: {
+						if (getConfig("Zombies Can Spawn With Tools", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						if (ReikaASMHelper.removeMethod(cn, FMLForgePlugin.RUNTIME_DEOBF ? "func_82164_bB" : "addRandomArmor", "()V") == null)
+							throw new NoSuchASMMethodException(cn, "addRandomArmor", "()V");
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case MOBARMOR: {
+						if (getConfig("Mobs Can Spawn With Armor", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = getOrCreateMethod(cn, "func_82164_bB", "addRandomArmor", "()V");
+						m.instructions.add(new InsnNode(Opcodes.RETURN));
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
