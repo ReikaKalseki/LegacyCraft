@@ -17,7 +17,6 @@ public enum LegacyOptions implements BooleanConfig {
 	BABYZOMBIES("Disable Baby Zombies", true), //1.6
 	OLDRANGE("Old Zombie Sight Range", true), //1.6
 	OLDZOMBIES("Old Zombie HP/Damage", true), //1.6
-	ZOMBIESUMMONS("Disable Zombie Summons", true), //1.6
 	BONEMEAL("Old Bonemeal Mechanics", true), //1.5
 	ZOMBIEVILLAGER("Zombies Target Villagers", false), //1.2
 	BACKUP("Disable Zombie Reinforcements", true), //1.6
@@ -36,7 +35,7 @@ public enum LegacyOptions implements BooleanConfig {
 	GOLDENAPPLE("Golden Apple Level 0 Uses Nuggets", true), //1.6
 	HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5
 	SPIDERPOTIONS("Spider Potion Effects on Spawn", false), //1.6
-	FORCEMOBS("Enforced Mob Controls", true),
+	//FORCEMOBS("Enforced Mob Controls", true),
 	ENDERSOUNDS("New Angry Enderman Sounds", true), //1.4
 	ENDERBLOCKS("Allow Enderman Pickup of Cobble, Planks And Stone", false), //b1.9
 	ENDERDAY("Disable Random Enderman Teleporting in Daylight", true), //1.2?

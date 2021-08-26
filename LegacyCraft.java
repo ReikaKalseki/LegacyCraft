@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -145,6 +146,13 @@ public class LegacyCraft extends DragonAPIMod {
 		if (LegacyOptions.OLDPOTIONS.getState()) { //overwrite vanilla
 			LegacyPotionHealth health = new LegacyPotionHealth();
 			LegacyPotionRegen regen = new LegacyPotionRegen();
+		}
+
+		if (LegacyOptions.ENDERBLOCKS.getState()) {
+			EntityEnderman.setCarriable(Blocks.stone, true);
+			EntityEnderman.setCarriable(Blocks.planks, true);
+			EntityEnderman.setCarriable(Blocks.cobblestone, true);
+			EntityEnderman.setCarriable(Blocks.stonebrick, true);
 		}
 
 		if (LegacyOptions.SILVERFISH.getState()) {

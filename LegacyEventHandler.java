@@ -19,12 +19,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
+import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIBreakDoor;
 import net.minecraft.entity.ai.EntityAIMoveThroughVillage;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
@@ -41,7 +42,6 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
@@ -50,23 +50,16 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType;
 
-import Reika.DragonAPI.ModList;
-import Reika.DragonAPI.ASM.DependentMethodStripper.ModDependent;
 import Reika.DragonAPI.Instantiable.Event.AddRecipeEvent;
 import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
 import Reika.DragonAPI.Instantiable.Event.Client.LightmapEvent;
 import Reika.DragonAPI.Interfaces.Registry.ModCrop;
-import Reika.DragonAPI.Libraries.ReikaNBTHelper;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.Libraries.Rendering.ReikaColorAPI;
-import Reika.DragonAPI.ModInteract.ItemHandlers.TinkerBlockHandler;
 import Reika.DragonAPI.ModRegistry.ModCropList;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -107,46 +100,6 @@ public class LegacyEventHandler {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void enforceMobs(EntityJoinWorldEvent evt) {
 		if (!evt.world.isRemote) {
-			if (LegacyOptions.FORCEMOBS.getState()) {
-				Entity e = evt.entity;
-				Entity newEntity = null;/*
-				if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
-					newEntity = new EntityLegacyZombie((EntityZombie)e);
-				}
-				else if (e.getClass() == EntitySkeleton.class) {
-					if (MobOverrides.SKELETON.isActive()) {
-						newEntity = new EntityLegacySkeleton((EntitySkeleton)e);
-					}
-					else {
-						((EntitySkeleton)e).setSkeletonType(evt.world.provider.isHellWorld ? 1 : 0);
-					}
-				}
-				else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
-					newEntity = new EntityLegacyCreeper((EntityCreeper)e);
-				}
-				else*/ if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
-					newEntity = new EntityLegacyEnderman((EntityEnderman)e);
-				}
-				else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
-					newEntity = new EntityLegacyVillager((EntityVillager)e);
-				}
-				if (newEntity != null) {
-					newEntity.setLocationAndAngles(e.posX, e.posY, e.posZ, e.rotationYaw, e.rotationPitch);
-					evt.world.spawnEntityInWorld(newEntity);
-					newEntity.motionX = e.motionX;
-					newEntity.motionY = e.motionY;
-					newEntity.motionZ = e.motionZ;
-					if (e instanceof EntityLivingBase) {
-						EntityLivingBase elb = (EntityLivingBase)e;
-						for (int i = 0; i < 5; i++) {
-							newEntity.setCurrentItemOrArmor(i, elb.getEquipmentInSlot(i));
-						}
-						((EntityLivingBase)newEntity).setHealth(elb.getHealth());
-					}
-					ReikaNBTHelper.copyNBT(e.getEntityData(), newEntity.getEntityData());
-					evt.setCanceled(true);
-				}
-			}
 			if (evt.entity instanceof EntityLiving) {
 				EntityLiving e = (EntityLiving)evt.entity;
 				if (e.canPickUpLoot() && !LegacyOptions.MOBPICKUP.getState())
@@ -156,6 +109,20 @@ public class LegacyEventHandler {
 				EntityZombie e = (EntityZombie)evt.entity;
 				this.filterAI(e.tasks);
 				this.filterAI(e.targetTasks);
+			}
+			if (evt.entity instanceof EntityVillager) {
+				EntityVillager ev = (EntityVillager)evt.entity;
+				if (!LegacyOptions.ZOMBIEVILLAGER.getState() || !LegacyOptions.NEWAI.getState()) {
+					Iterator<EntityAITaskEntry> it = ev.tasks.taskEntries.iterator();
+					while (it.hasNext()) {
+						EntityAITaskEntry ai = it.next();
+						if (ai.action instanceof EntityAIAvoidEntity) {
+							EntityAIAvoidEntity ea = (EntityAIAvoidEntity)ai.action;
+							if (EntityZombie.class.isAssignableFrom(ea.targetEntityClass))
+								it.remove();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -175,17 +142,6 @@ public class LegacyEventHandler {
 		}
 	}
 
-	@SubscribeEvent //Fixes a TiC bug
-	@ModDependent(ModList.TINKERER)
-	public void necroticBones(LivingDropsEvent evt) {
-		if (evt.entityLiving.getClass() == EntityLegacySkeleton.class) {
-			if (((EntitySkeleton)evt.entityLiving).getSkeletonType() == 1) {
-				if (LegacyCraft.rand.nextInt(Math.max(1, 5-evt.lootingLevel)) == 0) //Same formula as TiC
-					ReikaItemHelper.dropItem(evt.entityLiving, TinkerBlockHandler.Materials.NECROTICBONE.getItem());
-			}
-		}
-	}
-
 	@SubscribeEvent()
 	public void animalSpawn(PopulateChunkEvent.Populate evt) {
 		if (evt.type == EventType.ANIMALS && LegacyOptions.ANIMALSPAWN.getState()) {
@@ -198,33 +154,26 @@ public class LegacyEventHandler {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void controlMobs(LivingSpawnEvent.CheckSpawn ev) {
 		EntityLivingBase e = ev.entityLiving;
-		if (e instanceof EntityBat) {
-			ev.setResult(LegacyOptions.BATS.getState() ? ev.getResult() : Result.DENY);
+		if (e instanceof EntityBat && !LegacyOptions.BATS.getState()) {
+			ev.setResult(Result.DENY);
 		}
-		if (e instanceof EntityWitch) {
-			ev.setResult(LegacyOptions.WITCHES.getState() ? ev.getResult() : Result.DENY);
+		else if (e instanceof EntityWitch && !LegacyOptions.WITCHES.getState()) {
+			ev.setResult(Result.DENY);
 		}
-		if (e instanceof EntityZombie) {
-			EntityZombie ez = (EntityZombie)e;
-			if (ez.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
-				//ev.setResult(Result.DENY);
-				ez.setChild(false);
-			}
-		}
-		if (e instanceof EntityHorse) {
-			ev.setResult(LegacyOptions.NOHORSES.getState() ? Result.DENY : ev.getResult());
+		else if (e instanceof EntityHorse && LegacyOptions.NOHORSES.getState()) {
+			ev.setResult(Result.DENY);
 		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void clearControlMobs(EntityJoinWorldEvent evt) {
 		Entity e = evt.entity;
-		if (e instanceof EntityHorse) {
-			evt.setCanceled(LegacyOptions.NOHORSES.getState() ? true : evt.isCanceled());
+		if (e instanceof EntityHorse && LegacyOptions.NOHORSES.getState()) {
+			evt.setCanceled(true);
 		}
 	}
 
-	@SubscribeEvent()
+	@SubscribeEvent
 	public void sheepPunch(AttackEntityEvent ev) {
 		if (LegacyOptions.SHEEPUNCH.getState()) {
 			Entity e = ev.target;
@@ -242,13 +191,9 @@ public class LegacyEventHandler {
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void noZombieGroups(SummonAidEvent ev) {
-		ev.setResult(LegacyOptions.BACKUP.getState() ? Result.DENY : ev.getResult());
-	}
-
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void noZombieRegen(SummonAidEvent ev) {
-		ev.setResult(LegacyOptions.BACKUP.getState() ? Result.DENY : ev.getResult());
+	public void noZombieBackup(SummonAidEvent ev) {
+		if (LegacyOptions.BACKUP.getState())
+			ev.setResult(Result.DENY);
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)

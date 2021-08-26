@@ -125,6 +125,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SKELLYRATE("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			SKELLYFIRE("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			SILENTVILLAGERS("net.minecraft.entity.passive.EntityVillager", "yv"),
+			ENDERSOUNDS("net.minecraft.entity.monster.EntityEnderman", "ya"),
 			;
 
 			private final String obfName;
@@ -697,6 +698,22 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 						m = ReikaASMHelper.getMethodByName(cn, "func_70673_aS", "getDeathSound", "()Ljava/lang/String;");
 						redirectInstanceFunctionWithReturnHook(cn, m, "getVillagerSound");
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case ENDERSOUNDS: {
+						if (getConfig("New Angry Enderman Sounds", true)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70823_r", "isScreaming", "()Z");
+						m.instructions.clear();
+						m.instructions.add(new InsnNode(Opcodes.ICONST_0));
+						m.instructions.add(new InsnNode(Opcodes.RETURN));
+
+						m = ReikaASMHelper.getMethodByName(cn, "func_70782_k", "findPlayerToAttack", "()Lnet/minecraft/entity/Entity;");
+						LdcInsnNode ldc = (LdcInsnNode)ReikaASMHelper.getFirstInsnAfter(m.instructions, 0, Opcodes.LDC, "mob.endermen.stare");
+						ReikaASMHelper.replaceInstruction(m.instructions, ldc.getNext(), new InsnNode(Opcodes.FCONST_0));
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}

@@ -87,7 +87,7 @@ public class LegacyASMHooks {
 		if (e instanceof EntityZombie) {
 			if (LegacyOptions.OLDRANGE.getState())
 				e.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(16.0D);
-			if (LegacyOptions.ZOMBIESUMMONS.getState())
+			if (LegacyOptions.BACKUP.getState())
 				e.getEntityAttribute(EntityZombie.field_110186_bp).setBaseValue(0.0D);
 		}
 	}
