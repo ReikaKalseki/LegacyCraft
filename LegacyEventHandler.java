@@ -9,6 +9,7 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -17,6 +18,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIAttackOnCollide;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAIBreakDoor;
+import net.minecraft.entity.ai.EntityAIMoveThroughVillage;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -60,7 +67,6 @@ import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -91,6 +97,10 @@ public class LegacyEventHandler {
 					}
 				}
 			}
+			if (evt.entityLiving instanceof EntitySkeleton) {
+				EntitySkeleton es = (EntitySkeleton)evt.entityLiving;
+				LegacyASMHooks.correctSkeletonType(es);
+			}
 		}
 	}
 
@@ -99,7 +109,7 @@ public class LegacyEventHandler {
 		if (!evt.world.isRemote) {
 			if (LegacyOptions.FORCEMOBS.getState()) {
 				Entity e = evt.entity;
-				Entity newEntity = null;
+				Entity newEntity = null;/*
 				if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
 					newEntity = new EntityLegacyZombie((EntityZombie)e);
 				}
@@ -110,11 +120,11 @@ public class LegacyEventHandler {
 					else {
 						((EntitySkeleton)e).setSkeletonType(evt.world.provider.isHellWorld ? 1 : 0);
 					}
-				}/*
+				}
 				else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
 					newEntity = new EntityLegacyCreeper((EntityCreeper)e);
-				}*/
-				else if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
+				}
+				else*/ if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
 					newEntity = new EntityLegacyEnderman((EntityEnderman)e);
 				}
 				else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
@@ -142,6 +152,26 @@ public class LegacyEventHandler {
 				if (e.canPickUpLoot() && !LegacyOptions.MOBPICKUP.getState())
 					e.setCanPickUpLoot(false);
 			}
+			if (evt.entity instanceof EntityZombie) {
+				EntityZombie e = (EntityZombie)evt.entity;
+				this.filterAI(e.tasks);
+				this.filterAI(e.targetTasks);
+			}
+		}
+	}
+
+	private void filterAI(EntityAITasks tasks) {
+		Iterator<EntityAIBase> it = tasks.taskEntries.iterator();
+		while (it.hasNext()) {
+			EntityAIBase ai = it.next();
+			if (!LegacyOptions.ZOMBIEDOOR.getState() && ai instanceof EntityAIBreakDoor)
+				it.remove();
+			else if (!LegacyOptions.ZOMBIEVILLAGER.getState() && ai instanceof EntityAIMoveThroughVillage)
+				it.remove();
+			else if (!LegacyOptions.ZOMBIEVILLAGER.getState() && ai instanceof EntityAIAttackOnCollide && ((EntityAIAttackOnCollide)ai).classTarget == EntityVillager.class)
+				it.remove();
+			else if (!LegacyOptions.ZOMBIEVILLAGER.getState() && ai instanceof EntityAINearestAttackableTarget && ((EntityAINearestAttackableTarget)ai).targetClass == EntityVillager.class)
+				it.remove();
 		}
 	}
 

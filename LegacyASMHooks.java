@@ -3,14 +3,17 @@ package Reika.LegacyCraft;
 import java.util.Collection;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 
@@ -24,8 +27,8 @@ public class LegacyASMHooks {
 	}
 	 */
 
-	public static boolean enableNewAI(EntityLivingBase e) {
-		return LegacyOptions.NEWAI.getState();
+	public static String getVillagerSound(EntityVillager e, String orig) {
+		return LegacyOptions.SILENTVILLAGERS.getState() ? null : orig;
 	}
 
 	public static String getFlintAndSteelSound() {
@@ -72,6 +75,9 @@ public class LegacyASMHooks {
 				ez.getNavigator().setBreakDoors(false);
 			}
 		}
+		if (e instanceof EntitySkeleton) {
+			correctSkeletonType((EntitySkeleton)e);
+		}
 		if (!LegacyOptions.MOBPICKUP.getState())
 			e.setCanPickUpLoot(false);
 		return el;
@@ -92,6 +98,15 @@ public class LegacyASMHooks {
 		if (c != null) {
 			for (AttributeModifier mod : c)
 				iai.removeModifier(mod);
+		}
+	}
+
+	public static void correctSkeletonType(EntitySkeleton es) {
+		boolean hell = es.worldObj.provider.isHellWorld;
+		if ((es.getSkeletonType() == 1) != hell) { //No normal archer skeletons in the nether
+			es.setSkeletonType(hell ? 1 : 0);
+			es.setCurrentItemOrArmor(0, new ItemStack(hell ? Items.stone_sword : Items.bow));
+			es.setCombatTask();
 		}
 	}
 

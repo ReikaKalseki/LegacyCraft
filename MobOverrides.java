@@ -12,15 +12,13 @@ package Reika.LegacyCraft;
 import net.minecraft.entity.EntityLiving;
 
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 
 public enum MobOverrides {
 
 	//CREEPER(EntityLegacyCreeper.class, "Creeper", 50),
-	SKELETON(EntityLegacySkeleton.class, "Skeleton", 51),
-	ZOMBIE(EntityLegacyZombie.class, "Zombie", 54),
+	//SKELETON(EntityLegacySkeleton.class, "Skeleton", 51),
+	//ZOMBIE(EntityLegacyZombie.class, "Zombie", 54),
 	//SPIDER(EntityLegacySpider.class, "Spider", 52),
 	ENDERMAN(EntityLegacyEnderman.class, "Enderman", 58),
 	VILLAGER(EntityLegacyVillager.class, "Villager", 120);

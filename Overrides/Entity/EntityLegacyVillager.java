@@ -49,22 +49,4 @@ public class EntityLegacyVillager extends EntityVillager {
 		}
 	}
 
-	@Override
-	protected String getLivingSound()
-	{
-		return LegacyOptions.SILENTVILLAGERS.getState() ? null : super.getLivingSound();
-	}
-
-	@Override
-	protected String getHurtSound()
-	{
-		return LegacyOptions.SILENTVILLAGERS.getState() ? null : super.getHurtSound();
-	}
-
-	@Override
-	protected String getDeathSound()
-	{
-		return LegacyOptions.SILENTVILLAGERS.getState() ? null : super.getDeathSound();
-	}
-
 }

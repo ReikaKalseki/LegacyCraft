@@ -24,6 +24,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -120,6 +121,10 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SPIDERATTR("net.minecraft.entity.monster.EntitySpider", "yn"),
 			ZOMBIETOOLS("net.minecraft.entity.monster.EntityZombie", "yq"),
 			MOBARMOR("net.minecraft.entity.monster.EntityMob", "yg"),
+			ZOMBIEFIRE("net.minecraft.entity.monster.EntityZombie", "yq"),
+			SKELLYRATE("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			SKELLYFIRE("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			SILENTVILLAGERS("net.minecraft.entity.passive.EntityVillager", "yv"),
 			;
 
 			private final String obfName;
@@ -641,6 +646,57 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						}
 						MethodNode m = getOrCreateMethod(cn, "func_82164_bB", "addRandomArmor", "()V");
 						m.instructions.add(new InsnNode(Opcodes.RETURN));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case ZOMBIEFIRE: {
+						if (getConfig("Zombies Attack with Fire", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70652_k", "attackEntityAsMob", "(Lnet/minecraft/entity/Entity;)Z");
+						MethodInsnNode min = ReikaASMHelper.getFirstMethodCallByName(cn, m, FMLForgePlugin.RUNTIME_DEOBF ? "func_70027_ad" : "isBurning");
+						AbstractInsnNode prev = min.getPrevious();
+						ReikaASMHelper.replaceInstruction(m.instructions, min, new InsnNode(Opcodes.ICONST_0));
+						m.instructions.remove(prev);
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case SKELLYRATE: {
+						if (!getConfig("Old Skeleton Fire Rate", true)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "<init>", "(Lnet/minecraft/world/World;)V");
+						IntInsnNode iin = (IntInsnNode)ReikaASMHelper.getFirstInsnAfter(m.instructions, 0, Opcodes.BIPUSH, 60);
+						iin.setOpcode(Opcodes.SIPUSH);
+						iin.operand = 300;
+						ReikaASMHelper.replaceInstruction(m.instructions, iin.getPrevious(), new InsnNode(Opcodes.ICONST_0));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case SKELLYFIRE: {
+						if (getConfig("Allow Skeleton Flaming Arrows", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_82196_d", "attackEntityWithRangedAttack", "(Lnet/minecraft/entity/EntityLivingBase;F)V");
+						FieldInsnNode fin = ReikaASMHelper.getFirstFieldCallByName(cn, m, FMLForgePlugin.RUNTIME_DEOBF ? "field_77343_v" : "flame");
+						JumpInsnNode jin = (JumpInsnNode)ReikaASMHelper.getFirstOpcodeAfter(m.instructions, m.instructions.indexOf(fin), Opcodes.IFGT);
+						jin.setOpcode(Opcodes.IF_ICMPGT);
+						m.instructions.insertBefore(jin, new IntInsnNode(Opcodes.BIPUSH, 100));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case SILENTVILLAGERS: {
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70639_aQ", "getLivingSound", "()Ljava/lang/String;");
+						redirectInstanceFunctionWithReturnHook(cn, m, "getVillagerSound");
+
+						m = ReikaASMHelper.getMethodByName(cn, "func_70621_aR", "getHurtSound", "()Ljava/lang/String;");
+						redirectInstanceFunctionWithReturnHook(cn, m, "getVillagerSound");
+
+						m = ReikaASMHelper.getMethodByName(cn, "func_70673_aS", "getDeathSound", "()Ljava/lang/String;");
+						redirectInstanceFunctionWithReturnHook(cn, m, "getVillagerSound");
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
