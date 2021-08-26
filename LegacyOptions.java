@@ -36,7 +36,7 @@ public enum LegacyOptions implements BooleanConfig {
 	GOLDENAPPLE("Golden Apple Level 0 Uses Nuggets", true), //1.6
 	HIDDENLAVA("Disable Nether Hidden Lava Pockets", true), //1.5
 	SPIDERPOTIONS("Spider Potion Effects on Spawn", false), //1.6
-	FORCEMOBS("Enforced Mob Controls", true),
+	//FORCEMOBS("Enforced Mob Controls", true),
 	ENDERSOUNDS("New Angry Enderman Sounds", true), //1.4
 	ENDERBLOCKS("Allow Enderman Pickup of Cobble, Planks And Stone", false), //b1.9
 	ENDERDAY("Disable Random Enderman Teleporting in Daylight", true), //1.2?

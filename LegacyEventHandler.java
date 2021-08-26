@@ -16,15 +16,12 @@ import net.minecraft.block.BlockSapling;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -54,11 +51,7 @@ import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.Libraries.Rendering.ReikaColorAPI;
 import Reika.DragonAPI.ModInteract.ItemHandlers.TinkerBlockHandler;
 import Reika.DragonAPI.ModRegistry.ModCropList;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
-import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -74,39 +67,51 @@ public class LegacyEventHandler {
 	private LegacyEventHandler() {
 
 	}
-
+	/*
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void enforceMobs(EntityJoinWorldEvent evt) {
 		if (LegacyOptions.FORCEMOBS.getState() && !evt.world.isRemote) {
 			Entity e = evt.entity;
+			Entity newEntity = null;
 			if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
-				evt.world.spawnEntityInWorld(new EntityLegacyZombie((EntityZombie)e));
-				evt.setCanceled(true);
+				newEntity = new EntityLegacyZombie((EntityZombie)e);
 			}
 			else if (e.getClass() == EntitySkeleton.class) {
 				if (MobOverrides.SKELETON.isActive()) {
-					evt.world.spawnEntityInWorld(new EntityLegacySkeleton((EntitySkeleton)e));
-					evt.setCanceled(true);
+					newEntity = new EntityLegacySkeleton((EntitySkeleton)e);
 				}
 				else {
 					((EntitySkeleton)e).setSkeletonType(evt.world.provider.isHellWorld ? 1 : 0);
 				}
 			}
 			else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
-				evt.world.spawnEntityInWorld(new EntityLegacyCreeper((EntityCreeper)e));
-				evt.setCanceled(true);
+				newEntity = new EntityLegacyCreeper((EntityCreeper)e);
 			}
 			else if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
-				evt.world.spawnEntityInWorld(new EntityLegacyEnderman((EntityEnderman)e));
-				evt.setCanceled(true);
+				newEntity = new EntityLegacyEnderman((EntityEnderman)e);
 			}
 			else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
-				evt.world.spawnEntityInWorld(new EntityLegacyVillager((EntityVillager)e));
+				newEntity = new EntityLegacyVillager((EntityVillager)e);
+			}
+			if (newEntity != null) {
+				newEntity.setLocationAndAngles(e.posX, e.posY, e.posZ, e.rotationYaw, e.rotationPitch);
+				evt.world.spawnEntityInWorld(newEntity);
+				newEntity.motionX = e.motionX;
+				newEntity.motionY = e.motionY;
+				newEntity.motionZ = e.motionZ;
+				if (e instanceof EntityLivingBase) {
+					EntityLivingBase elb = (EntityLivingBase)e;
+					for (int i = 0; i < 5; i++) {
+						newEntity.setCurrentItemOrArmor(i, elb.getEquipmentInSlot(i));
+					}
+					((EntityLivingBase)newEntity).setHealth(elb.getHealth());
+				}
+				ReikaNBTHelper.copyNBT(e.getEntityData(), newEntity.getEntityData());
 				evt.setCanceled(true);
 			}
 		}
 	}
-
+	 */
 	@SubscribeEvent //Fixes a TiC bug
 	@ModDependent(ModList.TINKERER)
 	public void necroticBones(LivingDropsEvent evt) {

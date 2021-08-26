@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -11,7 +11,6 @@ package Reika.LegacyCraft;
 
 import net.minecraft.entity.EntityLiving;
 
-import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyCreeper;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
@@ -39,7 +38,7 @@ public enum MobOverrides {
 		name = n;
 		entityID = id;
 	}
-
+	/*
 	@Deprecated
 	public void register() {
 		ReikaEntityHelper.overrideEntity(mobClass, name, entityID);
@@ -53,7 +52,7 @@ public enum MobOverrides {
 			}
 		}
 	}
-
+	 */
 	public boolean isActive() {
 		return LegacyCraft.config.overrideMob(this);
 	}

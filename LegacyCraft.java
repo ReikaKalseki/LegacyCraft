@@ -131,7 +131,7 @@ public class LegacyCraft extends DragonAPIMod {
 	public void load(FMLInitializationEvent event) {
 		this.startTiming(LoadPhase.LOAD);
 		//Overrides vanilla
-		MobOverrides.registerAll();
+		//MobOverrides.registerAll();
 
 		PlayerHandler.instance.registerTracker(new LegacyPlayerTracker());
 
@@ -272,6 +272,11 @@ public class LegacyCraft extends DragonAPIMod {
 	@Override
 	public URL getDocumentationSite() {
 		return DragonAPICore.getReikaForumPage();
+	}
+
+	@Override
+	public URL getBugSite() {
+		return DragonAPICore.getReikaGithubPage();
 	}
 
 	@Override
