@@ -10,6 +10,8 @@
 package Reika.LegacyCraft;
 
 import java.io.File;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,13 +22,11 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -38,6 +38,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
+import Reika.DragonAPI.Libraries.Java.ReikaASMHelper.PrimitiveType;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -109,6 +110,60 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				deobfName = deobf;
 			}
 
+			private static void redirectInstanceFunctionCall(ClassNode cn, MethodInsnNode min, String name) {
+				min.owner = "Reika/LegacyCraft/LegacyASMHooks";
+				ReikaASMHelper.addLeadingArgument(min, ReikaASMHelper.convertClassName(cn, true));
+				min.setOpcode(Opcodes.INVOKESTATIC);
+			}
+
+			private static void redirectInstanceFunction(ClassNode cn, MethodNode m, String name) {
+				m.instructions.clear();
+				ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
+				if ((m.access & Modifier.STATIC) == 0) {
+					li.add(0, ReikaASMHelper.convertClassName(cn, true));
+					m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				}
+				for (int i = 1; i < li.size()-1; i++) {
+					String arg = li.get(i);
+					PrimitiveType p = PrimitiveType.getFromSig(arg);
+					m.instructions.add(new VarInsnNode(p.loadCode, i));
+				}
+				String sig = ReikaASMHelper.compileSignature(li);
+				MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", name, sig, false);
+				m.instructions.add(call);
+				PrimitiveType pret = PrimitiveType.getFromSig(li.get(li.size()-1));
+				InsnNode ret = new InsnNode(pret.returnCode);
+				m.instructions.add(ret);
+				ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+				ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
+			}
+
+			private static void redirectInstanceFunctionWithReturnHook(ClassNode cn, MethodNode m, String name) {
+				InsnList calls = new InsnList();
+				ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
+				if ((m.access & Modifier.STATIC) == 0) {
+					li.add(0, ReikaASMHelper.convertClassName(cn, true));
+					calls.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				}
+				for (int i = 1; i < li.size()-1; i++) {
+					String arg = li.get(i);
+					PrimitiveType p = PrimitiveType.getFromSig(arg);
+					calls.add(new VarInsnNode(p.loadCode, i));
+				}
+				li.add(0, li.get(li.size()-1));
+				String sig = ReikaASMHelper.compileSignature(li);
+				MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", name, sig, false);
+				calls.add(call);
+				for (int i = m.instructions.size()-1; i >= 0; i--) {
+					AbstractInsnNode ain = m.instructions.get(i);
+					if (ReikaASMHelper.isReturn(ain)) {
+						m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(calls));
+					}
+				}
+				ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+				ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
+			}
+
 			private byte[] apply(byte[] data) {
 				ClassNode cn = new ClassNode();
 				ClassReader classReader = new ClassReader(data);
@@ -118,33 +173,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						if (FMLLaunchHandler.side() != Side.CLIENT)
 							break;
 						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149720_d", "colorMultiplier", "(Lnet/minecraft/world/IBlockAccess;III)I");
-						AbstractInsnNode start = null;
-						AbstractInsnNode ret = null;
-						for (int i = 0; i < m.instructions.size(); i++) {
-							AbstractInsnNode ain = m.instructions.get(i);
-							if (ain instanceof LineNumberNode) {
-								start = ain;
-							}
-							else if (ain.getOpcode() == Opcodes.IRETURN) {
-								ret = ain;
-							}
-						}
-						LabelNode l1 = new LabelNode();
-						LabelNode l2 = new LabelNode();
-						LabelNode l3 = new LabelNode();
-
-						m.instructions.remove(ret.getNext());
-						m.instructions.insert(ret, l3);
-						m.instructions.insertBefore(ret, l2);
-						m.instructions.insertBefore(ret, new FrameNode(Opcodes.F_SAME1, 0, null, 0, new Object[]{Opcodes.INTEGER}));
-
-						m.instructions.insert(start, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)); //does not use anything but opcode
-						m.instructions.insert(start, l1);
-						m.instructions.insert(start, new JumpInsnNode(Opcodes.GOTO, l2));
-						m.instructions.insert(start, new LdcInsnNode(0xffffff));
-						m.instructions.insert(start, new JumpInsnNode(Opcodes.IFEQ, l1));
-						m.instructions.insert(start, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
-						m.instructions.insert(start, new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "SUGARCANE", "LReika/LegacyCraft/LegacyOptions;"));
+						redirectInstanceFunctionWithReturnHook(cn, m, "getSugarcaneColorization");
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}

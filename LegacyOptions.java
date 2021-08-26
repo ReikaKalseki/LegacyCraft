@@ -9,10 +9,6 @@
  ******************************************************************************/
 package Reika.LegacyCraft;
 
-import java.io.File;
-
-import net.minecraftforge.common.config.Configuration;
-
 import Reika.DragonAPI.Interfaces.Configuration.BooleanConfig;
 
 public enum LegacyOptions implements BooleanConfig {
@@ -88,10 +84,6 @@ public enum LegacyOptions implements BooleanConfig {
 
 	public boolean getState() {
 		return (Boolean)LegacyCraft.config.getControl(this.ordinal());
-	}
-
-	public boolean getEarlyLoadState() {
-		return new Configuration(new File("/config/Reika/LegacyCraft/config.cfg")).get(this.getLabel(), "control setup", defaultState).getBoolean();
 	}
 
 	public boolean isDummiedOut() {
