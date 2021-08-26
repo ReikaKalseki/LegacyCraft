@@ -117,6 +117,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			}
 
 			private static void redirectInstanceFunction(ClassNode cn, MethodNode m, String name) {
+				/*
 				m.instructions.clear();
 				ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
 				if ((m.access & Modifier.STATIC) == 0) {
@@ -134,6 +135,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				PrimitiveType pret = PrimitiveType.getFromSig(li.get(li.size()-1));
 				InsnNode ret = new InsnNode(pret.returnCode);
 				m.instructions.add(ret);
+				 */
+				MethodInsnNode call = ReikaASMHelper.rerouteMethod(cn, m, "Reika/LegacyCraft/LegacyASMHooks", name);
 				ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
 				ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
 			}
@@ -172,8 +175,14 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					case SUGARCANE: {
 						if (FMLLaunchHandler.side() != Side.CLIENT)
 							break;
+						if (!getConfig("Disable Biome Colors on Sugarcane", true)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
 						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_149720_d", "colorMultiplier", "(Lnet/minecraft/world/IBlockAccess;III)I");
-						redirectInstanceFunctionWithReturnHook(cn, m, "getSugarcaneColorization");
+						m.instructions.clear();
+						m.instructions.add(new LdcInsnNode(0xffffff));
+						m.instructions.add(new InsnNode(Opcodes.IRETURN));
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
