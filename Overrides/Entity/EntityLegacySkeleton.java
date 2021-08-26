@@ -23,8 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacySkeleton extends EntitySkeleton {
@@ -47,21 +45,10 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 			targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
 		}
 		targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));*/
-
-		if (!LegacyOptions.MOBPICKUP.getState())
-			this.setCanPickUpLoot(false);
 	}
 
 	public EntityLegacySkeleton(EntitySkeleton e) {
 		this(e.worldObj);
-		this.setPosition(e.posX, e.posY, e.posZ);
-		motionX = e.motionX;
-		motionY = e.motionY;
-		motionZ = e.motionZ;
-		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
-		}
-		this.setHealth(e.getHealth());
 	}
 
 	private int getAttackInterval() {
@@ -147,57 +134,7 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		}
 		this.setCombatTask();
 
-		if (!LegacyOptions.MOBPICKUP.getState())
-			this.setCanPickUpLoot(false);
-
 		return par1IEntityLivingData;
-	}
-
-	@Override
-	protected void dropEquipment(boolean par1, int par2)
-	{
-		for (int j = 0; j < this.getLastActiveItems().length; ++j)
-		{
-			ItemStack itemstack = this.getEquipmentInSlot(j);
-			boolean flag1 = equipmentDropChances[j] > 1.0F;
-
-			if (itemstack != null && (par1 || flag1) && rand.nextFloat() - par2 * 0.01F < equipmentDropChances[j])
-			{
-				if (!flag1 && itemstack.isItemStackDamageable() && LegacyOptions.DAMAGEDDROPS.getState())
-				{
-					int k = Math.max(itemstack.getMaxDamage() - 25, 1);
-					int l = itemstack.getMaxDamage() - rand.nextInt(rand.nextInt(k) + 1);
-
-					if (l > k)
-					{
-						l = k;
-					}
-
-					if (l < 1)
-					{
-						l = 1;
-					}
-
-					itemstack.setItemDamage(l);
-				}
-
-				this.entityDropItem(itemstack, 0.0F);
-			}
-		}
-	}
-
-	@Override
-	public void onUpdate() {
-		super.onUpdate();
-
-		if (!LegacyOptions.MOBPICKUP.getState()) {
-			for (int i = 1; i < 5; i++) {
-				ItemStack is = this.getEquipmentInSlot(i);
-				this.setCurrentItemOrArmor(i, null);
-				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
-					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
-			}
-		}
 	}
 
 }

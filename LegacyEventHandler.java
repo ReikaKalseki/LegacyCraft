@@ -15,13 +15,17 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -31,6 +35,7 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -44,6 +49,7 @@ import Reika.DragonAPI.Instantiable.Event.AddRecipeEvent;
 import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
 import Reika.DragonAPI.Instantiable.Event.Client.LightmapEvent;
 import Reika.DragonAPI.Interfaces.Registry.ModCrop;
+import Reika.DragonAPI.Libraries.ReikaNBTHelper;
 import Reika.DragonAPI.Libraries.ReikaRecipeHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
@@ -51,7 +57,10 @@ import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.Libraries.Rendering.ReikaColorAPI;
 import Reika.DragonAPI.ModInteract.ItemHandlers.TinkerBlockHandler;
 import Reika.DragonAPI.ModRegistry.ModCropList;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyEnderman;
 import Reika.LegacyCraft.Overrides.Entity.EntityLegacySkeleton;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyVillager;
+import Reika.LegacyCraft.Overrides.Entity.EntityLegacyZombie;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -67,51 +76,75 @@ public class LegacyEventHandler {
 	private LegacyEventHandler() {
 
 	}
-	/*
+
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void enforceMobs(EntityJoinWorldEvent evt) {
-		if (LegacyOptions.FORCEMOBS.getState() && !evt.world.isRemote) {
-			Entity e = evt.entity;
-			Entity newEntity = null;
-			if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
-				newEntity = new EntityLegacyZombie((EntityZombie)e);
-			}
-			else if (e.getClass() == EntitySkeleton.class) {
-				if (MobOverrides.SKELETON.isActive()) {
-					newEntity = new EntityLegacySkeleton((EntitySkeleton)e);
-				}
-				else {
-					((EntitySkeleton)e).setSkeletonType(evt.world.provider.isHellWorld ? 1 : 0);
-				}
-			}
-			else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
-				newEntity = new EntityLegacyCreeper((EntityCreeper)e);
-			}
-			else if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
-				newEntity = new EntityLegacyEnderman((EntityEnderman)e);
-			}
-			else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
-				newEntity = new EntityLegacyVillager((EntityVillager)e);
-			}
-			if (newEntity != null) {
-				newEntity.setLocationAndAngles(e.posX, e.posY, e.posZ, e.rotationYaw, e.rotationPitch);
-				evt.world.spawnEntityInWorld(newEntity);
-				newEntity.motionX = e.motionX;
-				newEntity.motionY = e.motionY;
-				newEntity.motionZ = e.motionZ;
-				if (e instanceof EntityLivingBase) {
-					EntityLivingBase elb = (EntityLivingBase)e;
-					for (int i = 0; i < 5; i++) {
-						newEntity.setCurrentItemOrArmor(i, elb.getEquipmentInSlot(i));
+	public void enforceMobs(LivingUpdateEvent evt) {
+		if (evt.entityLiving instanceof EntityMob) {
+			if (!LegacyOptions.MOBPICKUP.getState()) {
+				boolean held = !(evt.entityLiving instanceof EntitySkeleton);
+				for (int i = held ? 0 : 1; i <= 4; i++) {
+					ItemStack is = evt.entityLiving.getEquipmentInSlot(i);
+					if (is != null) {
+						evt.entityLiving.setCurrentItemOrArmor(i, null);
+						if (ReikaRandomHelper.doWithChance(evt.entityLiving.equipmentDropChances[i]))
+							ReikaItemHelper.dropItem(evt.entityLiving.worldObj, evt.entityLiving.posX, evt.entityLiving.posY, evt.entityLiving.posZ, is);
 					}
-					((EntityLivingBase)newEntity).setHealth(elb.getHealth());
 				}
-				ReikaNBTHelper.copyNBT(e.getEntityData(), newEntity.getEntityData());
-				evt.setCanceled(true);
 			}
 		}
 	}
-	 */
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void enforceMobs(EntityJoinWorldEvent evt) {
+		if (!evt.world.isRemote) {
+			if (LegacyOptions.FORCEMOBS.getState()) {
+				Entity e = evt.entity;
+				Entity newEntity = null;
+				if (e.getClass() == EntityZombie.class && MobOverrides.ZOMBIE.isActive()) {
+					newEntity = new EntityLegacyZombie((EntityZombie)e);
+				}
+				else if (e.getClass() == EntitySkeleton.class) {
+					if (MobOverrides.SKELETON.isActive()) {
+						newEntity = new EntityLegacySkeleton((EntitySkeleton)e);
+					}
+					else {
+						((EntitySkeleton)e).setSkeletonType(evt.world.provider.isHellWorld ? 1 : 0);
+					}
+				}/*
+				else if (e.getClass() == EntityCreeper.class && MobOverrides.CREEPER.isActive()) {
+					newEntity = new EntityLegacyCreeper((EntityCreeper)e);
+				}*/
+				else if (e.getClass() == EntityEnderman.class && MobOverrides.ENDERMAN.isActive()) {
+					newEntity = new EntityLegacyEnderman((EntityEnderman)e);
+				}
+				else if (e.getClass() == EntityVillager.class && MobOverrides.VILLAGER.isActive()) {
+					newEntity = new EntityLegacyVillager((EntityVillager)e);
+				}
+				if (newEntity != null) {
+					newEntity.setLocationAndAngles(e.posX, e.posY, e.posZ, e.rotationYaw, e.rotationPitch);
+					evt.world.spawnEntityInWorld(newEntity);
+					newEntity.motionX = e.motionX;
+					newEntity.motionY = e.motionY;
+					newEntity.motionZ = e.motionZ;
+					if (e instanceof EntityLivingBase) {
+						EntityLivingBase elb = (EntityLivingBase)e;
+						for (int i = 0; i < 5; i++) {
+							newEntity.setCurrentItemOrArmor(i, elb.getEquipmentInSlot(i));
+						}
+						((EntityLivingBase)newEntity).setHealth(elb.getHealth());
+					}
+					ReikaNBTHelper.copyNBT(e.getEntityData(), newEntity.getEntityData());
+					evt.setCanceled(true);
+				}
+			}
+			if (evt.entity instanceof EntityLiving) {
+				EntityLiving e = (EntityLiving)evt.entity;
+				if (e.canPickUpLoot() && !LegacyOptions.MOBPICKUP.getState())
+					e.setCanPickUpLoot(false);
+			}
+		}
+	}
+
 	@SubscribeEvent //Fixes a TiC bug
 	@ModDependent(ModList.TINKERER)
 	public void necroticBones(LivingDropsEvent evt) {

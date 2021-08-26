@@ -107,6 +107,9 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			CREEPERENCHANT("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYENCHANT("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			ZOMBIEENCHANT("net.minecraft.entity.monster.EntityZombie", "yq"),
+			SPIDERENCHANT("net.minecraft.entity.monster.EntitySpider", "yn"),
+			EQUIPDMG("net.minecraft.entity.EntityLiving", "sw"),
+			ZOMBIEHOOKS("net.minecraft.entity.monster.EntityZombie", "yq"),
 			;
 
 			private final String obfName;
@@ -177,6 +180,10 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			}
 
 			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc) {
+				return getOrCreateMethod(cn, obf, deobf, desc, true);
+			}
+
+			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc, boolean clear) {
 				MethodNode m = null;
 				try {
 					m = ReikaASMHelper.getMethodByName(cn, obf, deobf, desc);
@@ -184,7 +191,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				catch (NoSuchASMMethodException e) {
 					m = ReikaASMHelper.addMethod(cn, new InsnList(), FMLForgePlugin.RUNTIME_DEOBF ? obf : deobf, desc, Modifier.PUBLIC);
 				}
-				m.instructions.clear();
+				if (clear)
+					m.instructions.clear();
 				return m;
 			}
 
@@ -214,6 +222,26 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				m.instructions.add(lb);
 				//m.instructions.add(new InsnNode(Opcodes.FRAME SAME));
 				m.instructions.add(new InsnNode(Opcodes.RETURN));
+			}
+
+			private static void addEggSpawnHook(ClassNode cn) {
+				MethodNode m = getOrCreateMethod(cn, "func_110161_a", "onSpawnWithEgg", "(Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;", false);
+				InsnList li = new InsnList();
+				li.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				li.add(new VarInsnNode(Opcodes.ALOAD, 1));
+				li.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "onEntitySpawn", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;", false));
+				if (m.instructions.size() == 0) {
+					m.instructions.add(li);
+					m.instructions.add(new InsnNode(Opcodes.ARETURN));
+				}
+				else {
+					for (int i = m.instructions.size()-1; i >= 0; i--) {
+						AbstractInsnNode ain = m.instructions.get(i);
+						if (ain.getOpcode() == Opcodes.ARETURN) {
+							m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(li));
+						}
+					}
+				}
 			}
 
 			private byte[] apply(byte[] data) {
@@ -514,9 +542,40 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 					}
 					case CREEPERENCHANT:
 					case SKELLYENCHANT:
-					case ZOMBIEENCHANT: {
+					case ZOMBIEENCHANT:
+					case SPIDERENCHANT: {
 						this.patchToolEnchant(cn);
 						flags |= ClassWriter.COMPUTE_FRAMES;
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case EQUIPDMG: {
+						if (getConfig("Damaged Mob Weapon Drops", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_82160_b", "dropEquipment", "(ZI)V");
+						String func = FMLForgePlugin.RUNTIME_DEOBF ? "func_77964_b" : "setItemDamage";
+						for (int i = 0; i < m.instructions.size(); i++) {
+							AbstractInsnNode ain = m.instructions.get(i);
+							if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+								MethodInsnNode min = (MethodInsnNode)ain;
+								if (func.equals(min.name)) {
+									m.instructions.insertBefore(min, new InsnNode(Opcodes.POP));
+									m.instructions.insertBefore(min, new InsnNode(Opcodes.ICONST_0));
+								}
+							}
+						}
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case ZOMBIEHOOKS: {
+						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_110161_a", "onSpawnWithEgg", "(Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;");
+						FieldInsnNode fin = ReikaASMHelper.getFirstFieldCallByName(cn, m, "field_142046_b");
+						int var = ((VarInsnNode)fin.getPrevious()).var;
+						VarInsnNode vin = (VarInsnNode)ReikaASMHelper.getLastInsnBefore(m.instructions, m.instructions.indexOf(fin), Opcodes.ASTORE, var);
+						m.instructions.insertBefore(vin, new VarInsnNode(Opcodes.ALOAD, 0));
+						m.instructions.insertBefore(vin, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "interceptZombieData", "(Lnet/minecraft/entity/monster/EntityZombie$GroupData;Lnet/minecraft/entity/monster/EntityZombie;)Lnet/minecraft/entity/monster/EntityZombie$GroupData;", false));
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}

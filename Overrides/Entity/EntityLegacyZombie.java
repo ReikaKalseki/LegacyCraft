@@ -10,7 +10,6 @@
 package Reika.LegacyCraft.Overrides.Entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIBreakDoor;
@@ -22,22 +21,14 @@ import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
-import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
-import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyZombie extends EntityZombie {
-
-	private ModifiableAttributeMap map;
 
 	public EntityLegacyZombie(World par1World) {
 		super(par1World);
@@ -67,20 +58,10 @@ public class EntityLegacyZombie extends EntityZombie {
 			//this.setChild(false);
 			this.setDead();
 
-		if (!LegacyOptions.MOBPICKUP.getState())
-			this.setCanPickUpLoot(false);
 	}
 
 	public EntityLegacyZombie(EntityZombie e) {
 		this(e.worldObj);
-		this.setPosition(e.posX, e.posY, e.posZ);
-		motionX = e.motionX;
-		motionY = e.motionY;
-		motionZ = e.motionZ;
-		for (int i = 0; i < 5; i++) {
-			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
-		}
-		this.setHealth(e.getHealth());
 	}
 
 	@Override
@@ -102,18 +83,6 @@ public class EntityLegacyZombie extends EntityZombie {
 	}
 
 	@Override
-	public BaseAttributeMap getAttributeMap()
-	{
-		super.getAttributeMap(); /*to avoid NPE due to bad coding:
-		java.lang.NullPointerException
-		2013-12-07 10:25:41 [INFO] [STDOUT] 	at net.minecraft.entity.EntityLivingBase.onUpdate(EntityLivingBase.java:1819)
-		2013-12-07 10:25:41 [INFO] [STDOUT] 	at net.minecraft.entity.EntityLiving.onUpdate(EntityLiving.java:256)*/
-		if (map == null)
-			map = new ModifiableAttributeMap();
-		return map;
-	}
-
-	@Override
 	public boolean attackEntityAsMob(Entity e)
 	{
 		boolean flag = super.attackEntityAsMob(e);
@@ -125,81 +94,6 @@ public class EntityLegacyZombie extends EntityZombie {
 			((EntityVillager)e).heal(f);
 		}
 		return flag;
-	}
-
-	@Override
-	public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1IEntityLivingData)
-	{
-		Object par1IEntityLivingData1 = super.onSpawnWithEgg(par1IEntityLivingData);
-
-		this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).removeModifier(new AttributeModifier("Random spawn bonus", rand.nextDouble() * 0.05000000074505806D, 0));
-		this.getEntityAttribute(SharedMonsterAttributes.followRange).removeModifier(new AttributeModifier("Random zombie-spawn bonus", rand.nextDouble() * 1.5D, 2));
-
-		this.getEntityAttribute(field_110186_bp).removeModifier(new AttributeModifier("Leader zombie bonus", rand.nextDouble() * 0.25D + 0.5D, 0));
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).removeModifier(new AttributeModifier("Leader zombie bonus", rand.nextDouble() * 3.0D + 1.0D, 2));
-
-		if (this.isVillager() && !LegacyOptions.ZOMBIEVILLAGER.getState())
-			this.setVillager(false);
-		if (this.isChild() && !LegacyOptions.BABYZOMBIES.getState())
-			//this.setChild(false);
-			this.setDead();
-
-		if (!LegacyOptions.MOBPICKUP.getState())
-			this.setCanPickUpLoot(false);
-
-		return (IEntityLivingData)par1IEntityLivingData1;
-	}
-
-	@Override
-	public void onUpdate() {
-		super.onUpdate();
-
-		if (!LegacyOptions.MOBPICKUP.getState()) {
-			for (int i = 0; i < 5; i++) {
-				ItemStack is = this.getEquipmentInSlot(i);
-				this.setCurrentItemOrArmor(i, null);
-				if (ReikaRandomHelper.doWithChance(equipmentDropChances[i]))
-					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
-			}
-		}
-
-		if (this.isChild() && LegacyOptions.BABYZOMBIES.getState()) {
-			//this.setChild(false);
-			this.setDead();
-		}
-	}
-
-	@Override
-	protected void dropEquipment(boolean par1, int par2) //args: was killed by player, looting
-	{
-		for (int j = 0; j < this.getLastActiveItems().length; ++j)
-		{
-			ItemStack itemstack = this.getEquipmentInSlot(j);
-			boolean flag1 = equipmentDropChances[j] > 1.0F;
-
-			if (itemstack != null && (par1 || flag1) && rand.nextFloat() - par2 * 0.01F < equipmentDropChances[j])
-			{
-				if (!flag1 && itemstack.isItemStackDamageable() && LegacyOptions.DAMAGEDDROPS.getState())
-				{
-					int k = Math.max(itemstack.getMaxDamage() - 25, 1);
-					int l = itemstack.getMaxDamage() - rand.nextInt(rand.nextInt(k) + 1);
-
-					if (l > k)
-					{
-						l = k;
-					}
-
-					if (l < 1)
-					{
-						l = 1;
-					}
-
-					itemstack.setItemDamage(l);
-				}
-
-				this.entityDropItem(itemstack, 0.0F);
-			}
-		}
 	}
 
 }
