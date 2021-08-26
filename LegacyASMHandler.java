@@ -12,7 +12,7 @@ package Reika.LegacyCraft;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -37,6 +37,8 @@ import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
+import Reika.DragonAPI.Exception.ASMException.NoSuchASMMethodException;
+import Reika.DragonAPI.Instantiable.Data.Maps.MultiMap;
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper.PrimitiveType;
 
@@ -77,7 +79,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 	public static class LegacyTransformer implements IClassTransformer {
 
-		private static final HashMap<String, ClassPatch> classes = new HashMap();
+		private static final MultiMap<String, ClassPatch> classes = new MultiMap().setNullEmpty();
 
 		private static final Configuration config = new Configuration(new File("/config/Reika/LegacyCraft/config.cfg"));
 
@@ -98,6 +100,13 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			WATERPATCH("net.minecraft.block.Block", "aji"),
 			LAVAHISS("net.minecraft.block.BlockLiquid", "alw"),
 			FLINTSOUND("net.minecraft.item.ItemFlintAndSteel", "acw"),
+			CREEPERFALL("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			CREEPERAI("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			SKELLYAI("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			ZOMBIEAI("net.minecraft.entity.monster.EntityZombie", "yq"),
+			CREEPERENCHANT("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			SKELLYENCHANT("net.minecraft.entity.monster.EntitySkeleton", "yl"),
+			ZOMBIEENCHANT("net.minecraft.entity.monster.EntityZombie", "yq"),
 			;
 
 			private final String obfName;
@@ -167,10 +176,51 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
 			}
 
+			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc) {
+				MethodNode m = null;
+				try {
+					m = ReikaASMHelper.getMethodByName(cn, obf, deobf, desc);
+				}
+				catch (NoSuchASMMethodException e) {
+					m = ReikaASMHelper.addMethod(cn, new InsnList(), FMLForgePlugin.RUNTIME_DEOBF ? obf : deobf, desc, Modifier.PUBLIC);
+				}
+				m.instructions.clear();
+				return m;
+			}
+
+			private static void patchMoveSpeed(ClassNode cn) {
+				MethodNode m = getOrCreateMethod(cn, "func_70689_ay", "getAIMoveSpeed", "()F");
+				m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, "getAIMoveSpeed", "()F", false));
+				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "getAIMoveSpeed", "(F)F", false));
+				m.instructions.add(new InsnNode(Opcodes.FRETURN));
+			}
+
+			private static void patchAI(ClassNode cn) {
+				MethodNode m = getOrCreateMethod(cn, "func_70650_aV", "isAIEnabled", "()Z");
+				m.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "NEWAI", "LReika/LegacyCraft/LegacyOptions;"));
+				m.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
+				m.instructions.add(new InsnNode(Opcodes.IRETURN));
+			}
+
+			private static void patchToolEnchant(ClassNode cn) {
+				MethodNode m = getOrCreateMethod(cn, "func_82162_bC", "enchantEquipment", "()V");
+				LabelNode lb = new LabelNode();
+				m.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "HELDENCHANT", "LReika/LegacyCraft/LegacyOptions;"));
+				m.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
+				m.instructions.add(new JumpInsnNode(Opcodes.IFEQ, lb));
+				m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, "enchantEquipment", "()V", false));
+				m.instructions.add(lb);
+				//m.instructions.add(new InsnNode(Opcodes.FRAME SAME));
+				m.instructions.add(new InsnNode(Opcodes.RETURN));
+			}
+
 			private byte[] apply(byte[] data) {
 				ClassNode cn = new ClassNode();
 				ClassReader classReader = new ClassReader(data);
 				classReader.accept(cn, 0);
+				int flags = ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/;
 				switch(this) {
 					case SUGARCANE: {
 						if (FMLLaunchHandler.side() != Side.CLIENT)
@@ -437,15 +487,41 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							if (ain.getOpcode() == Opcodes.LDC) {
 								LdcInsnNode ldc = (LdcInsnNode)ain;
 								if ("fire.ignite".equals(ldc.cst)) {
-									ReikaASMHelper.replaceInstruction(m.instructions, ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyCraft", "getFlintAndSteelSound", "()Ljava/lang/String;", false));
+									ReikaASMHelper.replaceInstruction(m.instructions, ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "getFlintAndSteelSound", "()Ljava/lang/String;", false));
 								}
 							}
 						}
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
+					case CREEPERFALL: {
+						if (getConfig("Creepers Explode on Fall", false)) {
+							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
+							return data;
+						}
+						if (ReikaASMHelper.removeMethod(cn, FMLForgePlugin.RUNTIME_DEOBF ? "func_70069_a" : "fall", "(F)V") == null)
+							throw new NoSuchASMMethodException(cn, "fall", "(F)V");
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case CREEPERAI:
+					case SKELLYAI:
+					case ZOMBIEAI: {
+						patchAI(cn);
+						patchMoveSpeed(cn);
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case CREEPERENCHANT:
+					case SKELLYENCHANT:
+					case ZOMBIEENCHANT: {
+						this.patchToolEnchant(cn);
+						flags |= ClassWriter.COMPUTE_FRAMES;
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
 				}
-				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/);
+				ClassWriter writer = new ClassWriter(flags);
 				cn.accept(writer);
 				return writer.toByteArray();
 			}
@@ -454,11 +530,13 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 		@Override
 		public byte[] transform(String className, String className2, byte[] opcodes) {
 			if (!classes.isEmpty()) {
-				ClassPatch p = classes.get(className);
-				if (p != null) {
+				Collection<ClassPatch> c = classes.get(className);
+				if (c != null) {
 					ReikaASMHelper.activeMod = "LegacyCraft";
-					ReikaASMHelper.log("Patching class "+p.deobfName);
-					opcodes = p.apply(opcodes);
+					ReikaASMHelper.log("Patching class "+c.iterator().next().deobfName);
+					for (ClassPatch p : c) {
+						opcodes = p.apply(opcodes);
+					}
 					classes.remove(className); //for maximizing performance
 					ReikaASMHelper.activeMod = null;
 				}
@@ -470,7 +548,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			for (int i = 0; i < ClassPatch.list.length; i++) {
 				ClassPatch p = ClassPatch.list[i];
 				String s = !FMLForgePlugin.RUNTIME_DEOBF ? p.deobfName : p.obfName;
-				classes.put(s, p);
+				classes.addValue(s, p);
 			}
 		}
 

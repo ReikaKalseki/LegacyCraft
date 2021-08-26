@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -33,7 +33,6 @@ import net.minecraft.world.World;
 import Reika.DragonAPI.Instantiable.ModifiableAttributeMap;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacyZombie extends EntityZombie {
@@ -85,14 +84,6 @@ public class EntityLegacyZombie extends EntityZombie {
 	}
 
 	@Override
-	protected void enchantEquipment()
-	{
-		if (LegacyOptions.HELDENCHANT.getState()) {
-			super.enchantEquipment();
-		}
-	}
-
-	@Override
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
@@ -120,18 +111,6 @@ public class EntityLegacyZombie extends EntityZombie {
 		if (map == null)
 			map = new ModifiableAttributeMap();
 		return map;
-	}
-
-	@Override
-	protected boolean isAIEnabled()
-	{
-		return LegacyOptions.NEWAI.getState();
-	}
-
-	@Override
-	public float getAIMoveSpeed()
-	{
-		return this.isAIEnabled() ? super.getAIMoveSpeed() : LegacyCraft.getNonAIMoveSpeed();
 	}
 
 	@Override

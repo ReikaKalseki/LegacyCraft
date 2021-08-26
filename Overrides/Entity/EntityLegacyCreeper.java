@@ -20,7 +20,6 @@ import net.minecraft.world.World;
 import Reika.DragonAPI.Instantiable.Event.MobTargetingEvent;
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
@@ -44,29 +43,6 @@ public class EntityLegacyCreeper extends EntityCreeper {
 			this.setCurrentItemOrArmor(i, e.getEquipmentInSlot(i));
 		}
 		this.setHealth(e.getHealth());
-	}
-
-	@Override
-	protected void enchantEquipment()
-	{
-		if (LegacyOptions.HELDENCHANT.getState()) {
-			super.enchantEquipment();
-		}
-	}
-
-	@Override
-	public boolean isAIEnabled()
-	{
-		return LegacyOptions.NEWAI.getState();
-	}
-
-	@Override
-	protected void fall(float par1)
-	{
-		super.fall(par1);
-		if (!LegacyOptions.CREEPERFALL.getState()) {
-			timeSinceIgnited = 0;
-		}
 	}
 
 	@Override
@@ -101,12 +77,6 @@ public class EntityLegacyCreeper extends EntityCreeper {
 					ReikaItemHelper.dropItem(worldObj, posX, posY, posZ, is);
 			}
 		}
-	}
-
-	@Override
-	public float getAIMoveSpeed()
-	{
-		return this.isAIEnabled() ? super.getAIMoveSpeed() : LegacyCraft.getNonAIMoveSpeed();
 	}
 
 	@Override

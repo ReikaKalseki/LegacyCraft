@@ -310,12 +310,8 @@ public class LegacyCraft extends DragonAPIMod {
 		ev.setResult(LegacyOptions.HIDDENLAVA.getState() ? Result.DENY : Result.DEFAULT);
 	}*/
 
-	public static float getNonAIMoveSpeed() {
-		return 0.2F;
-	}
-
-	public static String getFlintAndSteelSound() {
-		return LegacyOptions.FLINTSOUND.getState() ? sounds.getResource(flintAndSteel).toString() : "fire.ignite";
+	public static String getOldFlintAndSteelSound() {
+		return sounds.getResource(flintAndSteel).toString();
 	}
 
 }

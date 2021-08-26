@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -25,7 +25,6 @@ import net.minecraft.world.WorldProviderHell;
 
 import Reika.DragonAPI.Libraries.Java.ReikaRandomHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
-import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
 
 public class EntityLegacySkeleton extends EntitySkeleton {
@@ -65,12 +64,6 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		this.setHealth(e.getHealth());
 	}
 
-	@Override
-	public boolean isAIEnabled()
-	{
-		return LegacyOptions.NEWAI.getState();
-	}
-
 	private int getAttackInterval() {
 		return LegacyOptions.ARROWSPEED.getState() ? 300 : 60;
 	}
@@ -87,14 +80,6 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		if (this.getSkeletonType() != 1 && worldObj.provider.isHellWorld) { //No normal archer skeletons in the nether
 			this.setSkeletonType(1);
 			this.setCurrentItemOrArmor(0, new ItemStack(Items.stone_sword));
-		}
-	}
-
-	@Override
-	protected void enchantEquipment()
-	{
-		if (LegacyOptions.HELDENCHANT.getState()) {
-			super.enchantEquipment();
 		}
 	}
 
@@ -126,11 +111,6 @@ public class EntityLegacySkeleton extends EntitySkeleton {
 		worldObj.spawnEntityInWorld(entityarrow);
 	}
 
-	@Override
-	public float getAIMoveSpeed()
-	{
-		return this.isAIEnabled() ? super.getAIMoveSpeed() : LegacyCraft.getNonAIMoveSpeed();
-	}
 	/*
 	@Override
 	public void setCombatTask()
