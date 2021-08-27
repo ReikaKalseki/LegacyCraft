@@ -2,18 +2,25 @@ package Reika.LegacyCraft;
 
 import java.util.Collection;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathFinder;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.World;
 
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 
@@ -108,6 +115,52 @@ public class LegacyASMHooks {
 			es.setCurrentItemOrArmor(0, new ItemStack(hell ? Items.stone_sword : Items.bow));
 			es.setCombatTask();
 		}
+	}
+
+	public static PathEntity getPathEntityToEntity(World world, Entity src, Entity tgt, float dist, boolean useOpenDoors, boolean useClosedDoors, boolean avoidWater, boolean canSwim) {
+		int x0 = MathHelper.floor_double(src.posX);
+		int y0 = MathHelper.floor_double(src.posY + 1.0D);
+		int z0 = MathHelper.floor_double(src.posZ);
+		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob) {
+			return getDumbPath(world, src, MathHelper.floor_double(tgt.posX), MathHelper.floor_double(tgt.posY), MathHelper.floor_double(tgt.posZ), dist);
+		}
+		world.theProfiler.startSection("pathfind");
+		int sr = (int)(dist + 16.0F);
+		int x1 = x0 - sr;
+		int y1 = y0 - sr;
+		int z1 = z0 - sr;
+		int x2 = x0 + sr;
+		int y2 = y0 + sr;
+		int z2 = z0 + sr;
+		ChunkCache chunkcache = new ChunkCache(world, x1, y1, z1, x2, y2, z2, 0);
+		PathEntity pathentity = (new PathFinder(chunkcache, useOpenDoors, useClosedDoors, avoidWater, canSwim)).createEntityPathTo(src, tgt, dist);
+		world.theProfiler.endSection();
+		return pathentity;
+	}
+
+	public static PathEntity getEntityPathToXYZ(World world, Entity src, int x, int y, int z, float dist, boolean useOpenDoors, boolean useClosedDoors, boolean avoidWater, boolean canSwim) {
+		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob) {
+			return getDumbPath(world, src, x, y, z, dist);
+		}
+		world.theProfiler.startSection("pathfind");
+		int x0 = MathHelper.floor_double(src.posX);
+		int y0 = MathHelper.floor_double(src.posY);
+		int z0 = MathHelper.floor_double(src.posZ);
+		int sr = (int)(dist + 8.0F);
+		int x1 = x0 - sr;
+		int y1 = y0 - sr;
+		int z1 = z0 - sr;
+		int x2 = x0 + sr;
+		int y2 = y0 + sr;
+		int z2 = z0 + sr;
+		ChunkCache chunkcache = new ChunkCache(world, x1, y1, z1, x2, y2, z2, 0);
+		PathEntity pathentity = (new PathFinder(chunkcache, useOpenDoors, useClosedDoors, avoidWater, canSwim)).createEntityPathTo(src, x, y, z, dist);
+		world.theProfiler.endSection();
+		return pathentity;
+	}
+
+	private static PathEntity getDumbPath(World world, Entity src, int x, int y, int z, float dist) {
+
 	}
 
 }

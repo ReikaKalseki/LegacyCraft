@@ -127,6 +127,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			SKELLYFIRE("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			SILENTVILLAGERS("net.minecraft.entity.passive.EntityVillager", "yv"),
 			ENDERSOUNDS("net.minecraft.entity.monster.EntityEnderman", "ya"),
+			DUMBPATH("net.minecraft.world.World", "ahb"),
 			;
 
 			private final String obfName;
@@ -278,6 +279,11 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						}
 					}
 				}
+			}
+
+			private static void patchPathCalc(ClassNode cn, String obf, String deobf, String sig) {
+				MethodNode m = ReikaASMHelper.getMethodByName(cn, obf, deobf, sig);
+				redirectInstanceFunction(cn, m, deobf);
 			}
 
 			private byte[] apply(byte[] data) {
@@ -716,6 +722,12 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						m = ReikaASMHelper.getMethodByName(cn, "func_70782_k", "findPlayerToAttack", "()Lnet/minecraft/entity/Entity;");
 						LdcInsnNode ldc = (LdcInsnNode)ReikaASMHelper.getFirstInsnAfter(m.instructions, 0, Opcodes.LDC, "mob.endermen.stare");
 						ReikaASMHelper.replaceInstruction(m.instructions, ldc.getNext(), new InsnNode(Opcodes.FCONST_0));
+						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
+						break;
+					}
+					case DUMBPATH: {
+						patchPathCalc(cn, "func_72865_a", "getPathEntityToEntity", "(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/Entity;FZZZZ)Lnet/minecraft/pathfinding/PathEntity;");
+						patchPathCalc(cn, "func_72844_a", "getEntityPathToXYZ", "(Lnet/minecraft/entity/Entity;IIIFZZZZ)Lnet/minecraft/pathfinding/PathEntity;");
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
