@@ -43,6 +43,7 @@ import Reika.DragonAPI.Instantiable.Data.Maps.MultiMap;
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaASMHelper.PrimitiveType;
 
+import cpw.mods.fml.relauncher.FMLInjectionData;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
@@ -82,7 +83,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 		private static final MultiMap<String, ClassPatch> classes = new MultiMap().setNullEmpty();
 
-		private static final Configuration config = new Configuration(new File("/config/Reika/LegacyCraft/config.cfg"));
+		private static final Configuration config = new Configuration(new File((File)FMLInjectionData.data()[6], "config/Reika/LegacyCraft.cfg"));
 
 		private static boolean getConfig(String sg, boolean def) {
 			Property prop = config.get("control setup", sg, def);
@@ -165,8 +166,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 				m.instructions.add(ret);
 				 */
 				MethodInsnNode call = ReikaASMHelper.rerouteMethod(cn, m, "Reika/LegacyCraft/LegacyASMHooks", name);
-				ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
-				ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
+				//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+				ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
 			}
 
 			private static void redirectInstanceFunctionWithReturnHook(ClassNode cn, MethodNode m, String name) {
@@ -191,8 +192,8 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(calls));
 					}
 				}
-				ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
-				ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call)+".");
+				//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+				ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
 			}
 
 			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc) {
@@ -598,6 +599,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 								if (func.equals(min.name)) {
 									m.instructions.insertBefore(min, new InsnNode(Opcodes.POP));
 									m.instructions.insertBefore(min, new InsnNode(Opcodes.ICONST_0));
+									i += 3;
 								}
 							}
 						}
@@ -709,7 +711,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						MethodNode m = ReikaASMHelper.getMethodByName(cn, "func_70823_r", "isScreaming", "()Z");
 						m.instructions.clear();
 						m.instructions.add(new InsnNode(Opcodes.ICONST_0));
-						m.instructions.add(new InsnNode(Opcodes.RETURN));
+						m.instructions.add(new InsnNode(Opcodes.IRETURN));
 
 						m = ReikaASMHelper.getMethodByName(cn, "func_70782_k", "findPlayerToAttack", "()Lnet/minecraft/entity/Entity;");
 						LdcInsnNode ldc = (LdcInsnNode)ReikaASMHelper.getFirstInsnAfter(m.instructions, 0, Opcodes.LDC, "mob.endermen.stare");

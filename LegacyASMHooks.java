@@ -27,7 +27,7 @@ public class LegacyASMHooks {
 	}
 	 */
 
-	public static String getVillagerSound(EntityVillager e, String orig) {
+	public static String getVillagerSound(String orig, EntityVillager e) {
 		return LegacyOptions.SILENTVILLAGERS.getState() ? null : orig;
 	}
 

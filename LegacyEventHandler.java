@@ -85,7 +85,8 @@ public class LegacyEventHandler {
 					ItemStack is = evt.entityLiving.getEquipmentInSlot(i);
 					if (is != null) {
 						evt.entityLiving.setCurrentItemOrArmor(i, null);
-						if (ReikaRandomHelper.doWithChance(evt.entityLiving.equipmentDropChances[i]))
+						float f = evt.entityLiving instanceof EntityLiving ? ((EntityLiving)evt.entityLiving).equipmentDropChances[i] : 1;
+						if (f >= 1 || ReikaRandomHelper.doWithChance(f))
 							ReikaItemHelper.dropItem(evt.entityLiving.worldObj, evt.entityLiving.posX, evt.entityLiving.posY, evt.entityLiving.posZ, is);
 					}
 				}
@@ -128,9 +129,9 @@ public class LegacyEventHandler {
 	}
 
 	private void filterAI(EntityAITasks tasks) {
-		Iterator<EntityAIBase> it = tasks.taskEntries.iterator();
+		Iterator<EntityAITaskEntry> it = tasks.taskEntries.iterator();
 		while (it.hasNext()) {
-			EntityAIBase ai = it.next();
+			EntityAIBase ai = it.next().action;
 			if (!LegacyOptions.ZOMBIEDOOR.getState() && ai instanceof EntityAIBreakDoor)
 				it.remove();
 			else if (!LegacyOptions.ZOMBIEVILLAGER.getState() && ai instanceof EntityAIMoveThroughVillage)
