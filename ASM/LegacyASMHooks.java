@@ -1,4 +1,4 @@
-package Reika.LegacyCraft;
+package Reika.LegacyCraft.ASM;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +28,8 @@ import net.minecraft.world.World;
 import Reika.DragonAPI.Instantiable.Data.Immutable.Coordinate;
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 import Reika.DragonAPI.Libraries.MathSci.ReikaMathLibrary;
+import Reika.LegacyCraft.LegacyCraft;
+import Reika.LegacyCraft.LegacyOptions;
 
 public class LegacyASMHooks {
 	/*

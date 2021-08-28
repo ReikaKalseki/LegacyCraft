@@ -49,6 +49,7 @@ import Reika.DragonAPI.Instantiable.IO.SingleSound;
 import Reika.DragonAPI.Instantiable.IO.SoundLoader;
 import Reika.DragonAPI.Libraries.Java.ReikaArrayHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
+import Reika.LegacyCraft.ASM.LegacyASMHandler;
 import Reika.LegacyCraft.Overrides.LegacyPotionHealth;
 import Reika.LegacyCraft.Overrides.LegacyPotionRegen;
 

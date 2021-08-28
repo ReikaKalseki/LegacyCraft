@@ -60,6 +60,7 @@ import Reika.DragonAPI.Libraries.Registry.ReikaCropHelper;
 import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.Libraries.Rendering.ReikaColorAPI;
 import Reika.DragonAPI.ModRegistry.ModCropList;
+import Reika.LegacyCraft.ASM.LegacyASMHooks;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;

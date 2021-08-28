@@ -7,7 +7,7 @@
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
  ******************************************************************************/
-package Reika.LegacyCraft;
+package Reika.LegacyCraft.ASM;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -56,7 +56,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 	@Override
 	public String[] getASMTransformerClass() {
-		return new String[]{LegacyTransformer.class.getName(), MobTransformer};
+		return new String[]{LegacyTransformer.class.getName(), MobTransformer.class.getName()};
 	}
 
 	@Override
@@ -77,6 +77,85 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 	@Override
 	public String getAccessTransformerClass() {
 		return null;
+	}
+
+	static void redirectInstanceFunctionCall(ClassNode cn, MethodInsnNode min, String name) {
+		min.owner = "Reika/LegacyCraft/ASM/LegacyASMHooks";
+		ReikaASMHelper.addLeadingArgument(min, ReikaASMHelper.convertClassName(cn, true));
+		min.setOpcode(Opcodes.INVOKESTATIC);
+	}
+
+	static void redirectInstanceFunction(ClassNode cn, MethodNode m, String name) {
+		/*
+		m.instructions.clear();
+		ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
+		if ((m.access & Modifier.STATIC) == 0) {
+			li.add(0, ReikaASMHelper.convertClassName(cn, true));
+			m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		}
+		for (int i = 1; i < li.size()-1; i++) {
+			String arg = li.get(i);
+			PrimitiveType p = PrimitiveType.getFromSig(arg);
+			m.instructions.add(new VarInsnNode(p.loadCode, i));
+		}
+		String sig = ReikaASMHelper.compileSignature(li);
+		MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/ASM/LegacyASMHooks", name, sig, false);
+		m.instructions.add(call);
+		PrimitiveType pret = PrimitiveType.getFromSig(li.get(li.size()-1));
+		InsnNode ret = new InsnNode(pret.returnCode);
+		m.instructions.add(ret);
+		 */
+		MethodInsnNode call = ReikaASMHelper.rerouteMethod(cn, m, "Reika/LegacyCraft/ASM/LegacyASMHooks", name);
+		//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+		ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
+	}
+
+	static void redirectInstanceFunctionWithReturnHook(ClassNode cn, MethodNode m, String name) {
+		InsnList calls = new InsnList();
+		ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
+		if ((m.access & Modifier.STATIC) == 0) {
+			li.add(0, ReikaASMHelper.convertClassName(cn, true));
+			calls.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		}
+		for (int i = 1; i < li.size()-1; i++) {
+			String arg = li.get(i);
+			PrimitiveType p = PrimitiveType.getFromSig(arg);
+			calls.add(new VarInsnNode(p.loadCode, i));
+		}
+		li.add(0, li.get(li.size()-1));
+		String sig = ReikaASMHelper.compileSignature(li);
+		MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/ASM/LegacyASMHooks", name, sig, false);
+		calls.add(call);
+		for (int i = m.instructions.size()-1; i >= 0; i--) {
+			AbstractInsnNode ain = m.instructions.get(i);
+			if (ReikaASMHelper.isReturn(ain)) {
+				m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(calls));
+			}
+		}
+		//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+		ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
+	}
+
+	static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc) {
+		return getOrCreateMethod(cn, obf, deobf, desc, true);
+	}
+
+	static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc, boolean clear) {
+		MethodNode m = null;
+		try {
+			m = ReikaASMHelper.getMethodByName(cn, obf, deobf, desc);
+		}
+		catch (NoSuchASMMethodException e) {
+			m = ReikaASMHelper.addMethod(cn, new InsnList(), FMLForgePlugin.RUNTIME_DEOBF ? obf : deobf, desc, Modifier.PUBLIC);
+		}
+		if (clear)
+			m.instructions.clear();
+		return m;
+	}
+
+	private static void patchPathCalc(ClassNode cn, String obf, String deobf, String sig) {
+		MethodNode m = ReikaASMHelper.getMethodByName(cn, obf, deobf, sig);
+		redirectInstanceFunction(cn, m, deobf);
 	}
 
 	public static class LegacyTransformer implements IClassTransformer {
@@ -105,13 +184,13 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			CREEPERFALL("net.minecraft.entity.monster.EntityCreeper", "xz"),/*
 			CREEPERAI("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYAI("net.minecraft.entity.monster.EntitySkeleton", "yl"),
-			ZOMBIEAI("net.minecraft.entity.monster.EntityZombie", "yq"),*/
+			ZOMBIEAI("net.minecraft.entity.monster.EntityZombie", "yq"),*//*
 			CREEPERENCHANT("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYENCHANT("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			ZOMBIEENCHANT("net.minecraft.entity.monster.EntityZombie", "yq"),
-			SPIDERENCHANT("net.minecraft.entity.monster.EntitySpider", "yn"),
+			SPIDERENCHANT("net.minecraft.entity.monster.EntitySpider", "yn"),*/
 			EQUIPDMG("net.minecraft.entity.EntityLiving", "sw"),
-			ZOMBIEHOOKS("net.minecraft.entity.monster.EntityZombie", "yq"),
+			ZOMBIEHOOKS("net.minecraft.entity.monster.EntityZombie", "yq"),/*
 			CREEPERSPAWN("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYSPAWN("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			ZOMBIESPAWN("net.minecraft.entity.monster.EntityZombie", "yq"),
@@ -119,7 +198,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			CREEPERATTR("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYATTR("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			ZOMBIEATTR("net.minecraft.entity.monster.EntityZombie", "yq"),
-			SPIDERATTR("net.minecraft.entity.monster.EntitySpider", "yn"),
+			SPIDERATTR("net.minecraft.entity.monster.EntitySpider", "yn"),*/
 			ZOMBIETOOLS("net.minecraft.entity.monster.EntityZombie", "yq"),
 			MOBARMOR("net.minecraft.entity.monster.EntityMob", "yg"),
 			ZOMBIEFIRE("net.minecraft.entity.monster.EntityZombie", "yq"),
@@ -138,152 +217,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			private ClassPatch(String deobf, String obf) {
 				obfName = obf;
 				deobfName = deobf;
-			}
-
-			private static void redirectInstanceFunctionCall(ClassNode cn, MethodInsnNode min, String name) {
-				min.owner = "Reika/LegacyCraft/LegacyASMHooks";
-				ReikaASMHelper.addLeadingArgument(min, ReikaASMHelper.convertClassName(cn, true));
-				min.setOpcode(Opcodes.INVOKESTATIC);
-			}
-
-			private static void redirectInstanceFunction(ClassNode cn, MethodNode m, String name) {
-				/*
-				m.instructions.clear();
-				ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
-				if ((m.access & Modifier.STATIC) == 0) {
-					li.add(0, ReikaASMHelper.convertClassName(cn, true));
-					m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				}
-				for (int i = 1; i < li.size()-1; i++) {
-					String arg = li.get(i);
-					PrimitiveType p = PrimitiveType.getFromSig(arg);
-					m.instructions.add(new VarInsnNode(p.loadCode, i));
-				}
-				String sig = ReikaASMHelper.compileSignature(li);
-				MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", name, sig, false);
-				m.instructions.add(call);
-				PrimitiveType pret = PrimitiveType.getFromSig(li.get(li.size()-1));
-				InsnNode ret = new InsnNode(pret.returnCode);
-				m.instructions.add(ret);
-				 */
-				MethodInsnNode call = ReikaASMHelper.rerouteMethod(cn, m, "Reika/LegacyCraft/LegacyASMHooks", name);
-				//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
-				ReikaASMHelper.log("Constructed redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
-			}
-
-			private static void redirectInstanceFunctionWithReturnHook(ClassNode cn, MethodNode m, String name) {
-				InsnList calls = new InsnList();
-				ArrayList<String> li = ReikaASMHelper.parseMethodSignature(m);
-				if ((m.access & Modifier.STATIC) == 0) {
-					li.add(0, ReikaASMHelper.convertClassName(cn, true));
-					calls.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				}
-				for (int i = 1; i < li.size()-1; i++) {
-					String arg = li.get(i);
-					PrimitiveType p = PrimitiveType.getFromSig(arg);
-					calls.add(new VarInsnNode(p.loadCode, i));
-				}
-				li.add(0, li.get(li.size()-1));
-				String sig = ReikaASMHelper.compileSignature(li);
-				MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", name, sig, false);
-				calls.add(call);
-				for (int i = m.instructions.size()-1; i >= 0; i--) {
-					AbstractInsnNode ain = m.instructions.get(i);
-					if (ReikaASMHelper.isReturn(ain)) {
-						m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(calls));
-					}
-				}
-				//ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
-				ReikaASMHelper.log("Constructed return-preserving redirect in "+ReikaASMHelper.clearString(m)+" to "+ReikaASMHelper.clearString(call).replace("\n", "")+".");
-			}
-
-			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc) {
-				return getOrCreateMethod(cn, obf, deobf, desc, true);
-			}
-
-			private static MethodNode getOrCreateMethod(ClassNode cn, String obf, String deobf, String desc, boolean clear) {
-				MethodNode m = null;
-				try {
-					m = ReikaASMHelper.getMethodByName(cn, obf, deobf, desc);
-				}
-				catch (NoSuchASMMethodException e) {
-					m = ReikaASMHelper.addMethod(cn, new InsnList(), FMLForgePlugin.RUNTIME_DEOBF ? obf : deobf, desc, Modifier.PUBLIC);
-				}
-				if (clear)
-					m.instructions.clear();
-				return m;
-			}
-
-			private static void patchMoveSpeed(ClassNode cn) {
-				MethodNode m = getOrCreateMethod(cn, "func_70689_ay", "getAIMoveSpeed", "()F");
-				m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, "getAIMoveSpeed", "()F", false));
-				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "getAIMoveSpeed", "(F)F", false));
-				m.instructions.add(new InsnNode(Opcodes.FRETURN));
-			}
-
-			private static void patchAI(ClassNode cn) {
-				MethodNode m = getOrCreateMethod(cn, "func_70650_aV", "isAIEnabled", "()Z");
-				m.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "NEWAI", "LReika/LegacyCraft/LegacyOptions;"));
-				m.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
-				m.instructions.add(new InsnNode(Opcodes.IRETURN));
-			}
-
-			private static void patchToolEnchant(ClassNode cn) {
-				MethodNode m = getOrCreateMethod(cn, "func_82162_bC", "enchantEquipment", "()V");
-				LabelNode lb = new LabelNode();
-				m.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "Reika/LegacyCraft/LegacyOptions", "HELDENCHANT", "LReika/LegacyCraft/LegacyOptions;"));
-				m.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
-				m.instructions.add(new JumpInsnNode(Opcodes.IFEQ, lb));
-				m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, "enchantEquipment", "()V", false));
-				m.instructions.add(lb);
-				//m.instructions.add(new InsnNode(Opcodes.FRAME SAME));
-				m.instructions.add(new InsnNode(Opcodes.RETURN));
-			}
-
-			private static void addEggSpawnHook(ClassNode cn) {
-				MethodNode m = getOrCreateMethod(cn, "func_110161_a", "onSpawnWithEgg", "(Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;", false);
-				InsnList li = new InsnList();
-				li.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				li.add(new VarInsnNode(Opcodes.ALOAD, 1));
-				li.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "onEntitySpawn", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;", false));
-				if (m.instructions.size() == 0) {
-					m.instructions.add(li);
-					m.instructions.add(new InsnNode(Opcodes.ARETURN));
-				}
-				else {
-					for (int i = m.instructions.size()-1; i >= 0; i--) {
-						AbstractInsnNode ain = m.instructions.get(i);
-						if (ain.getOpcode() == Opcodes.ARETURN) {
-							m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(li));
-						}
-					}
-				}
-			}
-
-			private static void patchEntityAttr(ClassNode cn) {
-				MethodNode m = getOrCreateMethod(cn, "func_110147_ax", "applyEntityAttributes", "()V", false);
-				InsnList li = new InsnList();
-				li.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				li.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "applyEntityAttributes", "(Lnet/minecraft/entity/EntityLiving;)V", false));
-				if (m.instructions.size() == 0) {
-					m.instructions.add(li);
-					m.instructions.add(new InsnNode(Opcodes.RETURN));
-				}
-				else {
-					for (int i = m.instructions.size()-1; i >= 0; i--) {
-						AbstractInsnNode ain = m.instructions.get(i);
-						if (ain.getOpcode() == Opcodes.RETURN) {
-							m.instructions.insertBefore(ain, ReikaASMHelper.copyInsnList(li));
-						}
-					}
-				}
-			}
-
-			private static void patchPathCalc(ClassNode cn, String obf, String deobf, String sig) {
-				MethodNode m = ReikaASMHelper.getMethodByName(cn, obf, deobf, sig);
-				redirectInstanceFunction(cn, m, deobf);
 			}
 
 			private byte[] apply(byte[] data) {
@@ -557,7 +490,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							if (ain.getOpcode() == Opcodes.LDC) {
 								LdcInsnNode ldc = (LdcInsnNode)ain;
 								if ("fire.ignite".equals(ldc.cst)) {
-									ReikaASMHelper.replaceInstruction(m.instructions, ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "getFlintAndSteelSound", "()Ljava/lang/String;", false));
+									ReikaASMHelper.replaceInstruction(m.instructions, ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/ASM/LegacyASMHooks", "getFlintAndSteelSound", "()Ljava/lang/String;", false));
 								}
 							}
 						}
@@ -571,23 +504,6 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						}
 						if (ReikaASMHelper.removeMethod(cn, FMLForgePlugin.RUNTIME_DEOBF ? "func_70069_a" : "fall", "(F)V") == null)
 							throw new NoSuchASMMethodException(cn, "fall", "(F)V");
-						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
-						break;
-					}/*
-					case CREEPERAI:
-					case SKELLYAI:
-					case ZOMBIEAI: {
-						patchAI(cn);
-						patchMoveSpeed(cn);
-						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
-						break;
-					}*/
-					case CREEPERENCHANT:
-					case SKELLYENCHANT:
-					case ZOMBIEENCHANT:
-					case SPIDERENCHANT: {
-						this.patchToolEnchant(cn);
-						flags |= ClassWriter.COMPUTE_FRAMES;
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
@@ -618,23 +534,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						int var = ((VarInsnNode)fin.getPrevious()).var;
 						VarInsnNode vin = (VarInsnNode)ReikaASMHelper.getLastInsnBefore(m.instructions, m.instructions.indexOf(fin), Opcodes.ASTORE, var);
 						m.instructions.insertBefore(vin, new VarInsnNode(Opcodes.ALOAD, 0));
-						m.instructions.insertBefore(vin, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/LegacyASMHooks", "interceptZombieData", "(Lnet/minecraft/entity/monster/EntityZombie$GroupData;Lnet/minecraft/entity/monster/EntityZombie;)Lnet/minecraft/entity/monster/EntityZombie$GroupData;", false));
-						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
-						break;
-					}
-					case CREEPERSPAWN:
-					case SKELLYSPAWN:
-					case ZOMBIESPAWN:
-					case SPIDERSPAWN: {
-						this.addEggSpawnHook(cn);
-						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
-						break;
-					}
-					case CREEPERATTR:
-					case SKELLYATTR:
-					case ZOMBIEATTR:
-					case SPIDERATTR: {
-						this.patchEntityAttr(cn);
+						m.instructions.insertBefore(vin, new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/ASM/LegacyASMHooks", "interceptZombieData", "(Lnet/minecraft/entity/monster/EntityZombie$GroupData;Lnet/minecraft/entity/monster/EntityZombie;)Lnet/minecraft/entity/monster/EntityZombie$GroupData;", false));
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
 					}
