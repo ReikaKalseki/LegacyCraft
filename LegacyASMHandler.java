@@ -56,7 +56,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 
 	@Override
 	public String[] getASMTransformerClass() {
-		return new String[]{LegacyTransformer.class.getName()};
+		return new String[]{LegacyTransformer.class.getName(), MobTransformer};
 	}
 
 	@Override
@@ -102,10 +102,10 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 			WATERPATCH("net.minecraft.block.Block", "aji"),
 			LAVAHISS("net.minecraft.block.BlockLiquid", "alw"),
 			FLINTSOUND("net.minecraft.item.ItemFlintAndSteel", "acw"),
-			CREEPERFALL("net.minecraft.entity.monster.EntityCreeper", "xz"),
+			CREEPERFALL("net.minecraft.entity.monster.EntityCreeper", "xz"),/*
 			CREEPERAI("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYAI("net.minecraft.entity.monster.EntitySkeleton", "yl"),
-			ZOMBIEAI("net.minecraft.entity.monster.EntityZombie", "yq"),
+			ZOMBIEAI("net.minecraft.entity.monster.EntityZombie", "yq"),*/
 			CREEPERENCHANT("net.minecraft.entity.monster.EntityCreeper", "xz"),
 			SKELLYENCHANT("net.minecraft.entity.monster.EntitySkeleton", "yl"),
 			ZOMBIEENCHANT("net.minecraft.entity.monster.EntityZombie", "yq"),
@@ -573,7 +573,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 							throw new NoSuchASMMethodException(cn, "fall", "(F)V");
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
-					}
+					}/*
 					case CREEPERAI:
 					case SKELLYAI:
 					case ZOMBIEAI: {
@@ -581,7 +581,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						patchMoveSpeed(cn);
 						ReikaASMHelper.log("Successfully applied "+this+" ASM handler!");
 						break;
-					}
+					}*/
 					case CREEPERENCHANT:
 					case SKELLYENCHANT:
 					case ZOMBIEENCHANT:

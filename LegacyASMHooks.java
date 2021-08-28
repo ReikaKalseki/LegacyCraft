@@ -1,5 +1,6 @@
 package Reika.LegacyCraft;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import net.minecraft.entity.Entity;
@@ -16,13 +17,17 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathFinder;
+import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
 
+import Reika.DragonAPI.Instantiable.Data.Immutable.Coordinate;
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
+import Reika.DragonAPI.Libraries.MathSci.ReikaMathLibrary;
 
 public class LegacyASMHooks {
 	/*
@@ -159,8 +164,30 @@ public class LegacyASMHooks {
 		return pathentity;
 	}
 
-	private static PathEntity getDumbPath(World world, Entity src, int x, int y, int z, float dist) {
-
+	private static PathEntity getDumbPath(World world, Entity src, int x0, int y0, int z0, double dist) {
+		double dx = x0+0.5-src.posX;
+		double dy = y0-src.posY;
+		double dz = z0+0.5-src.posZ;
+		double dd = ReikaMathLibrary.py3d(dx, dy, dz);
+		if (dd > dist)
+			return null;
+		double dl = 0.25D/dd;
+		ArrayList<PathPoint> li = new ArrayList();
+		Path p = new Path(); //this is necessary to init the points
+		Coordinate cur = null;
+		for (double d = 0; d <= 1; d += dl) {
+			double x = x0+dx*d;
+			double y = y0+dy*d;
+			double z = z0+dz*d;
+			Coordinate c2 = new Coordinate(x, y, z);
+			if (!c2.equals(cur)) {
+				cur = c2;
+				PathPoint pp = new PathPoint(c2.xCoord, c2.yCoord, c2.zCoord);
+				li.add(pp);
+				p.addPoint(pp);
+			}
+		}
+		return new PathEntity(li.toArray(new PathPoint[li.size()]));
 	}
 
 }
