@@ -23,17 +23,45 @@ public class MobTransformer implements IClassTransformer {
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] data) {
+		ReikaASMHelper.activeMod = "LegacyCraft";
+		//ReikaASMHelper.log("Applying mob patches to "+name+"/"+transformedName);
+		for (Patches p : Patches.list) {
+			try {
+				data = this.write(p, data);
+			}
+			catch (Throwable e) {
+				ClassNode cn = new ClassNode();
+				ClassReader classReader = new ClassReader(data);
+				classReader.accept(cn, 0);
+				p.apply(cn, ClassWriter.COMPUTE_MAXS);
+				ReikaASMHelper.logError("Unable to patch mob class '"+cn.name+"' ^ '"+cn.superName+"': "+e.toString());
+				/*
+				for (MethodNode m : cn.methods) {
+					ReikaASMHelper.log("====  METHOD "+m.name+" "+m.desc+"  ====");
+					ReikaASMHelper.log(ReikaASMHelper.clearString(m.instructions));
+					ReikaASMHelper.log("=====================");
+				}*/
+				ReikaASMHelper.writeClassFile(cn, "LgCASMOutput");
+				e.printStackTrace();
+			}
+		}
+		ReikaASMHelper.activeMod = null;
+		return data;
+	}
+
+	private byte[] write(Patches p, byte[] data) {
 		ClassNode cn = new ClassNode();
 		ClassReader classReader = new ClassReader(data);
 		classReader.accept(cn, 0);
-		int flags = ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/;
-		for (Patches p : Patches.list) {
-			if (p.appliesTo(cn)) {
-				flags = p.apply(transformedName, cn, flags);
-			}
+		if (!p.appliesTo(cn)) {
+			return data;
 		}
+		ReikaASMHelper.log("Applying "+p+" ASM handler to "+cn.name);
+		int flags = ClassWriter.COMPUTE_MAXS/* | ClassWriter.COMPUTE_FRAMES*/;
+		flags = p.apply(cn, flags);
 		ClassWriter writer = new ClassWriter(flags);
 		cn.accept(writer);
+		ReikaASMHelper.log("Successfully applied "+p+" ASM handler to "+cn.name+"!");
 		return writer.toByteArray();
 	}
 
@@ -100,7 +128,7 @@ public class MobTransformer implements IClassTransformer {
 		m.instructions.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "Reika/LegacyCraft/LegacyOptions", "getState", "()Z", false));
 		m.instructions.add(new JumpInsnNode(Opcodes.IFEQ, lb));
 		m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, "enchantEquipment", "()V", false));
+		m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, m.name, m.desc, false));
 		m.instructions.add(lb);
 		//m.instructions.add(new InsnNode(Opcodes.FRAME SAME));
 		m.instructions.add(new InsnNode(Opcodes.RETURN));
@@ -119,7 +147,7 @@ public class MobTransformer implements IClassTransformer {
 
 		private static final Patches[] list = values();
 
-		private int apply(String n, ClassNode cn, int flags) {
+		private int apply(ClassNode cn, int flags) {
 			switch(this) {
 				case ATTR:
 					patchEntityAttr(cn);
@@ -136,7 +164,6 @@ public class MobTransformer implements IClassTransformer {
 					patchMoveSpeed(cn);
 					break;*/
 			}
-			ReikaASMHelper.log("Successfully applied "+this+" ASM handler to "+cn.name+" ("+n+")!");
 			return flags;
 		}
 

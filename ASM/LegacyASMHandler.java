@@ -473,7 +473,7 @@ public class LegacyASMHandler implements IFMLLoadingPlugin {
 						break;
 					}
 					case LAVAHISS: {
-						if (!getConfig("Lava Movement Hiss", true)) {
+						if (getConfig("Lava Movement Hiss", true)) {
 							ReikaASMHelper.log("Not applying "+this+" ASM handler; disabled in config.");
 							return data;
 						}

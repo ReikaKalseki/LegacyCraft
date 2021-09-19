@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @author Reika Kalseki
- * 
+ *
  * Copyright 2017
- * 
+ *
  * All rights reserved.
  * Distribution of the software in any form is only allowed with
  * explicit, prior permission from the owner.
@@ -17,6 +17,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
+import Reika.DragonAPI.Instantiable.Event.BlockTickEvent;
+import Reika.DragonAPI.Instantiable.Event.BlockTickEvent.UpdateFlags;
 import Reika.DragonAPI.Libraries.World.ReikaWorldHelper;
 
 public class WorldGenCustomNetherLava extends WorldGenerator
@@ -76,7 +78,7 @@ public class WorldGenCustomNetherLava extends WorldGenerator
 			if (!forceUpdate && c == 4 && c2 == 1 || c == 5) {
 				world.setBlock(x, y, z, genBlock, 0, 2);
 				world.scheduledUpdatesAreImmediate = true;
-				genBlock.updateTick(world, x, y, z, rand);
+				BlockTickEvent.fire(genBlock, world, x, y, z, rand, UpdateFlags.FORCED);
 				world.scheduledUpdatesAreImmediate = false;
 			}
 
