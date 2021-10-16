@@ -30,6 +30,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -320,7 +321,8 @@ public class LegacyCraft extends DragonAPIMod {
 	}*/
 
 	public static String getOldFlintAndSteelSound() {
-		return sounds.getResource(flintAndSteel).toString();
+		ResourceLocation s = sounds != null ? sounds.getResource(flintAndSteel) : null;
+		return s != null ? s.toString() : "";
 	}
 
 }

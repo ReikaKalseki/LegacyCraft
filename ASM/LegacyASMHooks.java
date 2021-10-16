@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -27,6 +28,7 @@ import net.minecraft.world.World;
 
 import Reika.DragonAPI.Instantiable.Data.Immutable.Coordinate;
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
+import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
 import Reika.DragonAPI.Libraries.MathSci.ReikaMathLibrary;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
@@ -175,6 +177,7 @@ public class LegacyASMHooks {
 			return null;
 		double dl = 0.25D/dd;
 		ArrayList<PathPoint> li = new ArrayList();
+		ArrayList<Coordinate> li2 = new ArrayList();
 		Path p = new Path(); //this is necessary to init the points
 		Coordinate cur = null;
 		for (double d = 0; d <= 1; d += dl) {
@@ -182,12 +185,24 @@ public class LegacyASMHooks {
 			double y = y0+dy*d;
 			double z = z0+dz*d;
 			Coordinate c2 = new Coordinate(x, y, z);
+			while (!c2.softBlock(world))
+				c2 = c2.offset(0, 1, 0);
+			while (!c2.offset(0, -1, 0).softBlock(world))
+				c2 = c2.offset(0, -1, 0);
 			if (!c2.equals(cur)) {
 				cur = c2;
 				PathPoint pp = new PathPoint(c2.xCoord, c2.yCoord, c2.zCoord);
 				li.add(pp);
+				li2.add(c2);
 				p.addPoint(pp);
 			}
+		}
+		//ReikaJavaLibrary.pConsole(src+": "+li2);
+		if (src instanceof EntityLivingBase && src.posY < y0-0.5 && world.rand.nextInt(3) == 0) {
+			ReikaObfuscationHelper.invoke("jump", src);
+			float spd = ((EntityLivingBase)src).getAIMoveSpeed();
+			src.motionX = spd*dx/dd;
+			src.motionZ = spd*dz/dd;
 		}
 		return new PathEntity(li.toArray(new PathPoint[li.size()]));
 	}
