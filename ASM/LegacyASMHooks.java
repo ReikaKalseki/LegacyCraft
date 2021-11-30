@@ -185,10 +185,10 @@ public class LegacyASMHooks {
 			double y = y0+dy*d;
 			double z = z0+dz*d;
 			Coordinate c2 = new Coordinate(x, y, z);
+			while (c2.yCoord > 0 && c2.offset(0, -1, 0).softBlock(world))
+				c2 = c2.offset(0, -1, 0);
 			while (!c2.softBlock(world))
 				c2 = c2.offset(0, 1, 0);
-			while (!c2.offset(0, -1, 0).softBlock(world))
-				c2 = c2.offset(0, -1, 0);
 			if (!c2.equals(cur)) {
 				cur = c2;
 				PathPoint pp = new PathPoint(c2.xCoord, c2.yCoord, c2.zCoord);
@@ -197,8 +197,8 @@ public class LegacyASMHooks {
 				p.addPoint(pp);
 			}
 		}
-		//ReikaJavaLibrary.pConsole(src+": "+li2);
-		if (src instanceof EntityLivingBase && src.posY < y0-0.5 && world.rand.nextInt(3) == 0) {
+		//ReikaJavaLibrary.pConsole(src+" to "+x0+", "+y0+", "+z0+": "+li2);
+		if (src instanceof EntityLivingBase && src.onGround && src.posY < y0-0.5 && world.rand.nextInt(3) == 0) {
 			ReikaObfuscationHelper.invoke("jump", src);
 			float spd = ((EntityLivingBase)src).getAIMoveSpeed();
 			src.motionX = spd*dx/dd;

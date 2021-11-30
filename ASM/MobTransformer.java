@@ -172,7 +172,7 @@ public class MobTransformer implements IClassTransformer {
 				//case AI:
 				//	return extendsMob(cn) && !cn.name.contains("Spider");
 				default:
-					return extendsMob(cn);
+					return extendsMob(cn) && !cn.name.contains("Satisforestry");
 			}
 		}
 	}
