@@ -108,6 +108,9 @@ public class MobTransformer implements IClassTransformer {
 		li.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		li.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "Reika/LegacyCraft/ASM/LegacyASMHooks", "applyEntityAttributes", "(Lnet/minecraft/entity/EntityLiving;)V", false));
 		if (m.instructions.size() == 0) {
+			m.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+			m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, cn.superName, m.name, m.desc, false));
+			//m.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/monster/EntityMob", m.name, m.desc, false));
 			m.instructions.add(li);
 			m.instructions.add(new InsnNode(Opcodes.RETURN));
 		}

@@ -27,11 +27,13 @@ import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
 
 import Reika.DragonAPI.Instantiable.Data.Immutable.Coordinate;
+import Reika.DragonAPI.Interfaces.Entity.TameHostile;
 import Reika.DragonAPI.Libraries.ReikaEntityHelper;
 import Reika.DragonAPI.Libraries.Java.ReikaObfuscationHelper;
 import Reika.DragonAPI.Libraries.MathSci.ReikaMathLibrary;
 import Reika.LegacyCraft.LegacyCraft;
 import Reika.LegacyCraft.LegacyOptions;
+import Reika.Satisforestry.API.Spitter;
 
 public class LegacyASMHooks {
 	/*
@@ -130,7 +132,7 @@ public class LegacyASMHooks {
 		int x0 = MathHelper.floor_double(src.posX);
 		int y0 = MathHelper.floor_double(src.posY + 1.0D);
 		int z0 = MathHelper.floor_double(src.posZ);
-		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob) {
+		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob && !(src instanceof TameHostile) && !(src instanceof Spitter)) {
 			return getDumbPath(world, src, MathHelper.floor_double(tgt.posX), MathHelper.floor_double(tgt.posY), MathHelper.floor_double(tgt.posZ), dist);
 		}
 		world.theProfiler.startSection("pathfind");
@@ -148,7 +150,7 @@ public class LegacyASMHooks {
 	}
 
 	public static PathEntity getEntityPathToXYZ(World world, Entity src, int x, int y, int z, float dist, boolean useOpenDoors, boolean useClosedDoors, boolean avoidWater, boolean canSwim) {
-		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob) {
+		if (!LegacyOptions.NEWAI.getState() && src instanceof EntityMob && !(src instanceof TameHostile) && !(src instanceof Spitter)) {
 			return getDumbPath(world, src, x, y, z, dist);
 		}
 		world.theProfiler.startSection("pathfind");
