@@ -61,6 +61,7 @@ import Reika.DragonAPI.Libraries.Registry.ReikaItemHelper;
 import Reika.DragonAPI.Libraries.Rendering.ReikaColorAPI;
 import Reika.DragonAPI.ModRegistry.ModCropList;
 import Reika.LegacyCraft.ASM.LegacyASMHooks;
+import Reika.Satisforestry.API.Spitter;
 
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -79,7 +80,7 @@ public class LegacyEventHandler {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void enforceMobs(LivingUpdateEvent evt) {
-		if (evt.entityLiving instanceof EntityMob) {
+		if (evt.entityLiving instanceof EntityMob && !(evt.entityLiving instanceof Spitter)) {
 			if (!LegacyOptions.MOBPICKUP.getState()) {
 				boolean held = !(evt.entityLiving instanceof EntitySkeleton);
 				for (int i = held ? 0 : 1; i <= 4; i++) {
