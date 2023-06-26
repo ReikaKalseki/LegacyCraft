@@ -24,6 +24,8 @@ public class MobTransformer implements IClassTransformer {
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] data) {
 		ReikaASMHelper.activeMod = "LegacyCraft";
+		if (data == null)
+			return null;
 		//ReikaASMHelper.log("Applying mob patches to "+name+"/"+transformedName);
 		for (Patches p : Patches.list) {
 			try {
